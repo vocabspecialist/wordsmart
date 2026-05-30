@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="bn"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>শব্দভান্ডার — কামরুল হাসান</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.hero{text-align:center;padding:3rem 1rem 1.5rem;}
+.badge{display:inline-block;background:var(--ink);color:var(--gold);font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:600;padding:.32rem 1rem;border-radius:100px;letter-spacing:1px;margin-bottom:1.1rem;}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,6vw,4rem);font-weight:900;color:var(--ink);line-height:1.1;margin-bottom:.7rem;}
+.hero h1 em{color:var(--accent);font-style:italic;}
+.hero p{font-size:.95rem;color:var(--muted);max-width:500px;margin:0 auto 1.75rem;line-height:1.7;}
+.stats-bar{display:flex;background:var(--ink);border-radius:var(--r);overflow:hidden;max-width:560px;margin:0 auto 2rem;}
+.si{flex:1;padding:1rem .5rem;text-align:center;border-right:1px solid rgba(255,255,255,.1);}
+.si:last-child{border:none;}
+.sn{font-family:'JetBrains Mono',monospace;font-size:1.3rem;font-weight:600;color:var(--gold);display:block;}
+.sl{font-size:.67rem;color:rgba(255,255,255,.5);margin-top:.1rem;}
+.goal-card{background:white;border:2px solid var(--ink);border-radius:var(--r);padding:1rem 1.4rem;margin-bottom:1.1rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;transition:background .3s,border-color .3s;}
+.goal-left{flex:1;min-width:150px;}
+.goal-lbl{font-size:.75rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.4rem;display:flex;justify-content:space-between;}
+.goal-cnt{font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--accent3);font-weight:700;}
+.goal-sel{padding:.35rem .7rem;border:2px solid var(--ink);border-radius:8px;background:white;font-family:'Hind Siliguri',sans-serif;font-size:.82rem;cursor:pointer;color:var(--text);}
+.streak-badge{background:var(--gold);color:var(--ink);font-size:.76rem;font-weight:700;padding:.26rem .8rem;border-radius:100px;white-space:nowrap;flex-shrink:0;}
+.wod{background:var(--ink);color:white;border-radius:var(--r);padding:1.5rem 1.75rem;display:flex;align-items:center;gap:1.25rem;margin-bottom:1.25rem;cursor:pointer;transition:transform .2s;}
+.wod:hover{transform:translateY(-2px);}
+.wod-body{flex:1;min-width:0;}
+.wod-lbl{font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:600;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:.35rem;}
+.wod-word{font-family:'Playfair Display',serif;font-size:1.85rem;font-weight:900;margin-bottom:.2rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;}
+.wod-spk{background:none;border:1.5px solid rgba(255,255,255,.3);border-radius:5px;color:white;font-size:.78rem;padding:.13rem .4rem;cursor:pointer;}
+.wod-m{color:rgba(255,255,255,.7);font-size:.9rem;margin-bottom:.3rem;}
+.wod-s{color:rgba(255,255,255,.4);font-size:.78rem;font-style:italic;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.wod-btn{background:var(--gold);color:var(--ink);border:none;padding:.6rem 1.1rem;border-radius:8px;font-family:'Hind Siliguri',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+@media(max-width:560px){.wod{flex-direction:column;align-items:flex-start;}.wod-btn{width:100%;text-align:center;}}
+.menu-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.9rem;}
+.menu-card{background:white;border:2px solid var(--ink);border-radius:var(--r);padding:1.5rem;cursor:pointer;transition:all .22s cubic-bezier(.34,1.56,.64,1);text-decoration:none;color:inherit;display:block;position:relative;overflow:hidden;}
+.menu-card::before{content:'';position:absolute;inset:0;background:var(--cc,var(--ink));transform:translateY(101%);transition:transform .28s ease;z-index:0;}
+.menu-card:hover{transform:translateY(-3px);box-shadow:4px 4px 0 var(--ink);}
+.menu-card:hover::before{transform:translateY(0);}
+.menu-card:hover .mci,.menu-card:hover .mct,.menu-card:hover .mcd,.menu-card:hover .mctag{color:white!important;}
+.menu-card>*{position:relative;z-index:1;}
+.mci{font-size:2rem;margin-bottom:.65rem;display:block;}
+.mct{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;margin-bottom:.35rem;}
+.mcd{font-size:.83rem;color:var(--muted);line-height:1.6;}
+.mctag{display:inline-block;margin-top:.65rem;font-family:'JetBrains Mono',monospace;font-size:.66rem;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;}
+.menu-card.span2{grid-column:1/-1;}
+.new-tag{display:inline-block;background:var(--accent);color:white;font-size:.58rem;font-weight:700;padding:.08rem .38rem;border-radius:3px;margin-left:4px;vertical-align:middle;}
+@media(max-width:540px){.menu-grid{grid-template-columns:1fr;}.menu-card.span2{grid-column:1;}}
+</style>
+</head><body>
+<nav>
+  <a href="index.html" class="nav-logo">শব্দ<span>ভান্ডার</span><small>Word Smart I & II</small></a>
+  <ul id="desktop-nav"></ul>
+  <button id="hamburger" onclick="toggleMNav()">☰</button>
+</nav>
+<div id="mobile-nav"></div>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="badge">✦ WORD SMART I & II — ১০৩৮ শব্দ</div>
+    <h1>শব্দ শেখো,<br><em>বিশ্ব জয় করো</em></h1>
+    <p>Spaced Repetition · Audio · Quiz · Real Exam।</p>
+    <div class="stats-bar">
+      <div class="si"><span class="sn">১০৩৮</span><div class="sl">মোট শব্দ</div></div>
+      <div class="si"><span class="sn" id="s-l">০</span><div class="sl">শেখা হয়েছে</div></div>
+      <div class="si"><span class="sn" id="s-q">০%</span><div class="sl">সেরা কুইজ</div></div>
+    </div>
+  </div>
+
+  <div class="wod" onclick="goWod()">
+    <div class="wod-body">
+      <div class="wod-lbl">✦ আজকের শব্দ</div>
+      <div class="wod-word"><span id="ww">—</span><button class="wod-spk" onclick="event.stopPropagation();speak(document.getElementById('ww').textContent)">🔊</button></div>
+      <div class="wod-m" id="wm">লোড হচ্ছে...</div>
+      <div class="wod-s" id="ws"></div>
+    </div>
+    <button class="wod-btn">অভিধানে দেখো →</button>
+  </div>
+
+  <div class="sec-lbl">মোড বেছে নাও</div>
+  <div class="menu-grid">
+    <a href="flashcard.html" class="menu-card span2" style="--cc:#c84b31;">
+      <span class="mci">🃏</span><div class="mct">ফ্ল্যাশকার্ড <span class="new-tag">SRS</span></div>
+      <div class="mcd">Spaced Repetition + 🔊 উচ্চারণ। কার্ড দেখো, মূল্যায়ন দাও। কীবোর্ড: Space · 1 · 2 · 3 · 4</div>
+      <div class="mctag">→ বৈজ্ঞানিক পদ্ধতি</div>
+    </a>
+    <a href="exam.html" class="menu-card" style="--cc:#c84b31;">
+      <span class="mci">📝</span><div class="mct">রিয়েল এক্সাম <span class="new-tag">নতুন</span></div>
+      <div class="mcd">নেগেটিভ মার্কিং, টাইমার, সাবমিটের পরে ফুল রিপোর্ট।</div>
+      <div class="mctag">→ পরীক্ষার প্রস্তুতি</div>
+    </a>
+    <a href="quiz.html" class="menu-card" style="--cc:#2e86ab;">
+      <span class="mci">🧠</span><div class="mct">কুইজ মোড</div>
+      <div class="mcd">MCQ, সিনোনিম, এন্টোনিম, শূন্যস্থান + ⚡ Speed Round।</div>
+      <div class="mctag">→ ৫ ধরনের কুইজ</div>
+    </a>
+    <a href="dictionary.html" class="menu-card" style="--cc:#4caf7d;">
+      <span class="mci">📖</span><div class="mct">অভিধান</div>
+      <div class="mcd">A–Z ব্রাউজ, সার্চ, সিনোনিম–এন্টোনিম, 🔊 উচ্চারণ।</div>
+      <div class="mctag">→ ১০৩৮ শব্দ</div>
+    </a>
+    <a href="progress.html" class="menu-card span2" style="--cc:#d4a843;">
+      <span class="mci">📊</span><div class="mct">অগ্রগতি ও ট্র্যাকার</div>
+      <div class="mcd">Calendar heatmap · শব্দ ট্র্যাকার · পরীক্ষার ইতিহাস · বর্ণ-ভিত্তিক চার্ট।</div>
+      <div class="mctag">→ সম্পূর্ণ রিপোর্ট</div>
+    </a>
+  </div>
+</div>
+<footer><strong>শব্দভান্ডার</strong> &nbsp;·&nbsp; Word Smart I & II &nbsp;·&nbsp; ডেভেলপ করেছেন - কামরুল হাসান</footer>
+
+<script src="words_data.js"></script><script src="theme.js"></script><script src="nav.js"></script>
+<script>
+initNav('index.html'); initTheme();
+(function(){const w=WORDS_DATA[Math.floor(Date.now()/86400000)%WORDS_DATA.length];document.getElementById('ww').textContent=w.word;document.getElementById('wm').textContent=w.meaning;document.getElementById('ws').textContent=w.sentence?'"'+w.sentence+'"':'';window._wod=w;})();
+function goWod(){localStorage.setItem('vm_wod_id',window._wod.id);location.href='dictionary.html';}
+function setGoal(v){localStorage.setItem('vm_daily_goal',v);renderStats();}
+function renderStats(){
+  const learned=JSON.parse(localStorage.getItem('vm_learned')||'{}');
+  const lc=Object.values(learned).filter(Boolean).length;
+  const streak=parseInt(localStorage.getItem('vm_streak')||'0');
+  const qbest=parseInt(localStorage.getItem('vm_quiz_best')||'0');
+  const srs=JSON.parse(localStorage.getItem('vm_srs')||'{}');
+  const due=WORDS_DATA.filter(w=>{const c=srs[w.id];return!c||c.nextReview<=Date.now();}).length;
+  document.getElementById('s-l').textContent=lc;
+  document.getElementById('s-d').textContent=Math.min(due,999);
+  document.getElementById('s-q').textContent=qbest+'%';
+  document.getElementById('streak').textContent='🔥 '+streak+' দিন';
+  const goal=parseInt(localStorage.getItem('vm_daily_goal')||'20');
+  document.getElementById('g-sel').value=goal;
+  const today=JSON.parse(localStorage.getItem('vm_daily_counts')||'{}')[new Date().toDateString()]||0;
+  const pct=Math.min(100,Math.round(today/goal*100));
+  document.getElementById('g-fill').style.width=pct+'%';
+  document.getElementById('g-cnt').textContent=today+'/'+goal;
+}
+renderStats();
+</script>
+</body></html>
