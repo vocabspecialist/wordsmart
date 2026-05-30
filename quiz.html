@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="bn"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>কুইজ — শব্দভান্ডার</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.setup-title{font-family:'Playfair Display',serif;font-size:clamp(1.7rem,5vw,2.4rem);font-weight:900;margin-bottom:.3rem;}
+.qtype-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;margin-bottom:1.25rem;}
+@media(max-width:500px){.qtype-grid{grid-template-columns:1fr 1fr;}}
+.qtc{background:white;border:2.5px solid var(--ink);border-radius:12px;padding:1.1rem;cursor:pointer;transition:all .2s cubic-bezier(.34,1.56,.64,1);text-align:center;}
+.qtc:hover{transform:translateY(-2px);box-shadow:3px 3px 0 var(--ink);}
+.qtc.sel{background:var(--ink);color:white;}
+.qtc .qte{font-size:1.6rem;margin-bottom:.3rem;}
+.qtc .qtt{font-weight:700;font-size:.85rem;}
+.qtc .qtd{font-size:.7rem;color:var(--muted);margin-top:.15rem;}
+.qtc.sel .qtd{color:rgba(255,255,255,.6);}
+.setup-row{display:flex;gap:.75rem;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;}
+.setup-row label{font-weight:600;font-size:.88rem;}
+.setup-sel{padding:.42rem .85rem;border:2px solid var(--ink);border-radius:8px;background:white;font-family:'Hind Siliguri',sans-serif;font-size:.88rem;cursor:pointer;color:var(--text);}
+/* SPEED */
+.sp-wrap{display:none;}
+.sp-topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem;}
+.sp-score-txt{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;}
+.timer-ring-wrap{position:relative;width:80px;height:80px;flex-shrink:0;}
+.tring{transform:rotate(-90deg);}
+.tring circle{fill:none;stroke:var(--paper-warm);stroke-width:7;}
+.tring .tp{stroke:var(--accent);stroke-linecap:round;transition:stroke-dashoffset 1s linear;}
+.tnum{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:1.6rem;font-weight:700;color:var(--accent);}
+.sp-card{background:white;border:2.5px solid var(--ink);border-radius:18px;padding:1.75rem;text-align:center;box-shadow:5px 5px 0 var(--ink);}
+.sp-word{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,5vw,3rem);font-weight:900;margin-bottom:.75rem;color:var(--ink);}
+.sp-opts{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;}
+@media(max-width:400px){.sp-opts{grid-template-columns:1fr;}}
+.sp-opt{padding:.75rem;border:2px solid var(--paper-warm);background:var(--paper-warm);border-radius:9px;cursor:pointer;font-family:'Hind Siliguri',sans-serif;font-size:.88rem;font-weight:500;transition:all .15s;color:var(--text);}
+.sp-opt:hover:not(:disabled){border-color:var(--ink);background:white;}
+.sp-opt.sc{background:#d4edda;border-color:var(--accent3);color:#155724;font-weight:700;}
+.sp-opt.sw{background:#f8d7da;border-color:var(--accent);color:#721c24;}
+/* ACTIVE QUIZ */
+.qz-wrap{display:none;}
+.qz-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem;}
+.qz-meta{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--muted);}
+.qz-meta strong{color:var(--text);font-size:.9rem;}
+.score-badge{background:var(--ink);color:var(--gold);font-family:'JetBrains Mono',monospace;font-size:.82rem;font-weight:600;padding:.3rem .85rem;border-radius:100px;}
+.qprog{background:var(--paper-warm);border-radius:100px;height:5px;margin-bottom:1.25rem;overflow:hidden;}
+.qpfill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent3));border-radius:100px;transition:width .4s ease;}
+.q-card{background:white;border:2.5px solid var(--ink);border-radius:18px;padding:1.75rem;box-shadow:5px 5px 0 var(--ink);transition:background .3s,border-color .3s;}
+.qtag{font-family:'JetBrains Mono',monospace;font-size:.63rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;}
+.q-big-word{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,4vw,2.4rem);font-weight:900;color:var(--ink);margin-bottom:.25rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;}
+.q-spk{background:var(--paper-warm);border:1.5px solid var(--ink);border-radius:5px;padding:.15rem .45rem;cursor:pointer;font-size:.82rem;transition:all .2s;}
+.q-spk:hover{background:var(--ink);color:white;}
+.q-txt{font-size:.92rem;color:var(--muted);line-height:1.6;margin-bottom:.9rem;}
+.q-sent-box{background:var(--paper-warm);border-radius:8px;padding:.65rem .9rem;font-style:italic;font-size:.85rem;color:var(--text);line-height:1.5;margin-bottom:1rem;border-left:3px solid var(--accent);}
+.opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;}
+@media(max-width:480px){.opts-grid{grid-template-columns:1fr;}}
+.opt{padding:.75rem .95rem;border:2px solid var(--paper-warm);background:var(--paper-warm);border-radius:9px;cursor:pointer;font-family:'Hind Siliguri',sans-serif;font-size:.88rem;font-weight:500;text-align:left;transition:all .15s;color:var(--text);}
+.opt:hover:not(.oc):not(.ow):not(:disabled){border-color:var(--ink);background:white;}
+.opt.oc{background:#d4edda;border-color:var(--accent3);color:#155724;font-weight:700;}
+.opt.ow{background:#f8d7da;border-color:var(--accent);color:#721c24;}
+.fill-input{width:100%;padding:.75rem .95rem;border:2.5px solid var(--ink);border-radius:9px;font-family:'Hind Siliguri',sans-serif;font-size:1rem;background:white;margin-bottom:.65rem;transition:border-color .2s;color:var(--text);}
+.fill-input:focus{outline:none;border-color:var(--accent2);}
+.fill-input.fc{border-color:var(--accent3);background:#d4edda;}
+.fill-input.fw{border-color:var(--accent);background:#f8d7da;}
+.btn-submit{padding:.68rem 1.75rem;background:var(--accent2);color:white;border:none;border-radius:9px;font-size:.92rem;font-weight:700;font-family:'Hind Siliguri',sans-serif;cursor:pointer;}
+.feedback{padding:.85rem 1.1rem;border-radius:9px;margin-top:.85rem;font-size:.88rem;line-height:1.6;display:none;}
+.feedback.show{display:block;}
+.fb-ok{background:#d4edda;border-left:3px solid var(--accent3);}
+.fb-no{background:#f8d7da;border-left:3px solid var(--accent);}
+.btn-next{width:100%;padding:.85rem;background:var(--ink);color:white;border:none;border-radius:9px;font-size:.95rem;font-weight:700;font-family:'Hind Siliguri',sans-serif;cursor:pointer;margin-top:.65rem;display:none;transition:opacity .2s;}
+.btn-next.show{display:block;}
+.btn-next:hover{opacity:.85;}
+/* RESULTS */
+.res-wrap{display:none;text-align:center;}
+.res-card{background:white;border:2.5px solid var(--ink);border-radius:20px;padding:2.5rem 1.5rem;box-shadow:7px 7px 0 var(--ink);}
+.res-emoji{font-size:3.5rem;margin-bottom:.75rem;}
+.res-title{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;margin-bottom:.4rem;}
+.res-pct{font-family:'JetBrains Mono',monospace;font-size:3.2rem;font-weight:600;color:var(--accent2);margin:.65rem 0;}
+.res-stats{display:flex;gap:1.75rem;justify-content:center;margin:1.1rem 0;flex-wrap:wrap;}
+.rs{text-align:center;}
+.rs-n{font-family:'JetBrains Mono',monospace;font-size:1.6rem;font-weight:600;}
+.rs-l{font-size:.75rem;color:var(--muted);}
+/* SP results */
+.sp-res{display:none;text-align:center;}
+</style>
+</head><body>
+<nav>
+  <a href="index.html" class="nav-logo">শব্দ<span>ভান্ডার</span><small>Word Smart I & II</small></a>
+  <ul id="desktop-nav"></ul><button id="hamburger" onclick="toggleMNav()">☰</button>
+</nav>
+<div id="mobile-nav"></div>
+<div class="wrap">
+
+<!-- SETUP -->
+<div id="setup">
+  <div class="setup-title">কুইজ মোড 🧠</div>
+  <p style="color:var(--muted);margin-bottom:1.25rem;font-size:.92rem;">কুইজের ধরন বেছে নাও।</p>
+  <div class="qtype-grid">
+    <div class="qtc sel" onclick="selType('mcq',this)"><div class="qte">🎯</div><div class="qtt">MCQ</div><div class="qtd">সঠিক অর্থ বেছে নাও</div></div>
+    <div class="qtc" onclick="selType('synonym',this)"><div class="qte">🔗</div><div class="qtt">সিনোনিম</div><div class="qtd">সমার্থক শব্দ</div></div>
+    <div class="qtc" onclick="selType('antonym',this)"><div class="qte">↔️</div><div class="qtt">এন্টোনিম</div><div class="qtd">বিপরীত শব্দ</div></div>
+    <div class="qtc" onclick="selType('fill',this)"><div class="qte">✏️</div><div class="qtt">শূন্যস্থান</div><div class="qtd">বাক্যে শব্দ বসাও</div></div>
+    <div class="qtc" onclick="selType('speed',this)"><div class="qte">⚡</div><div class="qtt">Speed Round</div><div class="qtd">৬০ সেকেন্ডে যত পারো!</div></div>
+  </div>
+  <div class="setup-row">
+    <label>প্রশ্ন:</label>
+    <select class="setup-sel" id="qcount"><option value="10">১০টি</option><option value="20" selected>২০টি</option><option value="30">৩০টি</option><option value="50">৫০টি</option></select>
+    <label>উৎস:</label>
+    <select class="setup-sel" id="qsrc"><option value="all">সব শব্দ</option><option value="hard">কঠিন</option><option value="unseen">না-শেখা</option></select>
+  </div>
+  <button class="btn-main" onclick="startQuiz()">🚀 শুরু করো</button>
+</div>
+
+<!-- SPEED -->
+<div class="sp-wrap" id="sp-wrap">
+  <div class="sp-topbar">
+    <div class="sp-score-txt">স্কোর: <span id="sp-sc">০</span> &nbsp;✓<span id="sp-c">০</span> ✗<span id="sp-w">০</span></div>
+    <div class="timer-ring-wrap">
+      <svg class="tring" width="80" height="80" viewBox="0 0 80 80">
+        <circle cx="40" cy="40" r="33"/>
+        <circle class="tp" id="tp-ring" cx="40" cy="40" r="33" stroke-dasharray="207" stroke-dashoffset="0"/>
+      </svg>
+      <div class="tnum" id="sp-time">60</div>
+    </div>
+  </div>
+  <div class="sp-card">
+    <div class="sp-word" id="sp-word">—</div>
+    <div style="color:var(--muted);font-size:.85rem;margin-bottom:.75rem">সঠিক বাংলা অর্থ কোনটি?</div>
+    <div class="sp-opts" id="sp-opts"></div>
+  </div>
+</div>
+
+<!-- ACTIVE -->
+<div class="qz-wrap" id="qz-wrap">
+  <div class="qz-header">
+    <div class="qz-meta">প্রশ্ন <strong id="qnum">১</strong>/<span id="qtot">২০</span></div>
+    <div class="score-badge">✓ <span id="lscore">০</span></div>
+  </div>
+  <div class="qprog"><div class="qpfill" id="qpf" style="width:0%"></div></div>
+  <div class="q-card">
+    <div class="qtag" id="qtag"></div>
+    <div class="q-big-word"><span id="qword"></span><button class="q-spk" onclick="speak(document.getElementById('qword').textContent)">🔊</button></div>
+    <div class="q-txt" id="qtxt"></div>
+    <div class="q-sent-box" id="qsent" style="display:none"></div>
+    <div id="opts-area"></div>
+    <div class="feedback" id="feedback"></div>
+    <button class="btn-next" id="btn-next" onclick="nextQ()">পরবর্তী প্রশ্ন →</button>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="res-wrap" id="res-wrap">
+  <div class="res-card">
+    <div class="res-emoji" id="res-emoji">🎉</div>
+    <div class="res-title" id="res-title">দারুণ!</div>
+    <div class="res-pct" id="res-pct">০%</div>
+    <div class="res-stats">
+      <div class="rs"><div class="rs-n" style="color:var(--accent3)" id="rs-c">০</div><div class="rs-l">সঠিক</div></div>
+      <div class="rs"><div class="rs-n" style="color:var(--accent)" id="rs-w">০</div><div class="rs-l">ভুল</div></div>
+      <div class="rs"><div class="rs-n" id="rs-t">০</div><div class="rs-l">মোট</div></div>
+    </div>
+    <button class="btn-main" style="margin-bottom:.5rem" onclick="location.reload()">↩ আবার খেলো</button>
+    <button class="btn-alt" onclick="location.href='flashcard.html'">🃏 ফ্ল্যাশকার্ড</button>
+  </div>
+</div>
+<div class="sp-res" id="sp-res">
+  <div class="res-card">
+    <div class="res-emoji">⚡</div>
+    <div class="res-title">Speed Round শেষ!</div>
+    <div class="res-pct" id="sp-final">০</div>
+    <p style="color:var(--muted);margin-bottom:1rem">পয়েন্ট অর্জিত</p>
+    <div class="res-stats">
+      <div class="rs"><div class="rs-n" style="color:var(--accent3)" id="sp-rc">০</div><div class="rs-l">সঠিক</div></div>
+      <div class="rs"><div class="rs-n" style="color:var(--accent)" id="sp-rw">০</div><div class="rs-l">ভুল</div></div>
+    </div>
+    <button class="btn-main" style="margin-bottom:.5rem" onclick="location.reload()">⚡ আবার</button>
+    <button class="btn-alt" onclick="location.href='quiz.html'">🧠 অন্য কুইজ</button>
+  </div>
+</div>
+</div>
+<footer><strong>শব্দভান্ডার</strong> — ডেভেলপ করেছেন - কামরুল হাসান</footer>
+
+<script src="words_data.js"></script><script src="theme.js"></script><script src="nav.js"></script>
+<script>
+initNav('quiz.html');initTheme();
+const words=WORDS_DATA;
+let qType='mcq',deck=[],curQ=0,correct=0,wrong=0,answered=false;
+let spTimer,spTime=60,spScore=0,spC=0,spW=0;
+
+function selType(t,el){qType=t;document.querySelectorAll('.qtc').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');}
+function incToday(){const t=new Date().toDateString();const d=JSON.parse(localStorage.getItem('vm_daily_counts')||'{}');d[t]=(d[t]||0)+1;localStorage.setItem('vm_daily_counts',JSON.stringify(d));}
+
+function startQuiz(){
+  if(qType==='speed'){startSpeed();return;}
+  const cnt=+document.getElementById('qcount').value||20;
+  const src=document.getElementById('qsrc').value;
+  const learned=JSON.parse(localStorage.getItem('vm_learned')||'{}');
+  const hard=JSON.parse(localStorage.getItem('vm_hard')||'{}');
+  let pool=[...words];
+  if(src==='unseen')pool=words.filter(w=>!learned[w.id]);
+  if(src==='hard')pool=words.filter(w=>hard[w.id]);
+  if(pool.length<4)pool=[...words];
+  if(qType==='synonym')pool=pool.filter(w=>w.synonyms?.length>0);
+  if(qType==='antonym')pool=pool.filter(w=>w.antonyms?.length>0);
+  if(pool.length<4)pool=[...words];
+  deck=pool.sort(()=>Math.random()-.5).slice(0,Math.min(cnt,pool.length));
+  curQ=0;correct=0;wrong=0;
+  document.getElementById('setup').style.display='none';
+  document.getElementById('qz-wrap').style.display='block';
+  document.getElementById('qtot').textContent=deck.length;
+  showQ();
+}
+
+function showQ(){
+  if(curQ>=deck.length){showRes();return;}
+  answered=false;
+  const w=deck[curQ];
+  document.getElementById('qnum').textContent=curQ+1;
+  document.getElementById('qpf').style.width=(curQ/deck.length*100)+'%';
+  document.getElementById('qword').textContent=w.word;
+  document.getElementById('feedback').className='feedback';document.getElementById('feedback').textContent='';
+  document.getElementById('btn-next').className='btn-next';
+  document.getElementById('qsent').style.display='none';
+  if(qType==='mcq')renderMCQ(w);
+  else if(qType==='synonym')renderSynAnt(w,'synonym');
+  else if(qType==='antonym')renderSynAnt(w,'antonym');
+  else renderFill(w);
+}
+
+function renderMCQ(w){
+  document.getElementById('qtag').textContent='● MCQ — সঠিক বাংলা অর্থ';
+  document.getElementById('qtxt').textContent='"'+w.word+'" শব্দের সঠিক বাংলা অর্থ কোনটি?';
+  const dis=words.filter(x=>x.id!==w.id).sort(()=>Math.random()-.5).slice(0,3);
+  const opts=[{t:w.meaning,c:true},...dis.map(d=>({t:d.meaning,c:false}))].sort(()=>Math.random()-.5);
+  document.getElementById('opts-area').innerHTML='<div class="opts-grid">'+opts.map(o=>`<button class="opt" onclick="checkMCQ(this,${o.c},'${esc(w.meaning)}')">${o.t}</button>`).join('')+'</div>';
+}
+function renderSynAnt(w,mode){
+  const isSyn=mode==='synonym';
+  document.getElementById('qtag').textContent=isSyn?'● সিনোনিম':'● এন্টোনিম';
+  document.getElementById('qtxt').textContent='"'+w.word+'" ('+w.meaning+') — এর '+(isSyn?'সিনোনিম':'এন্টোনিম')+' কোনটি?';
+  const list=isSyn?w.synonyms:w.antonyms;
+  const ans=list[Math.floor(Math.random()*list.length)];
+  const pool=[];words.forEach(o=>{if(o.id===w.id)return;const l=isSyn?o.synonyms:o.antonyms;l?.forEach(s=>{if(!list.includes(s))pool.push(s);});});
+  const opts=[{t:ans,c:true},...pool.sort(()=>Math.random()-.5).slice(0,3).map(d=>({t:d,c:false}))].sort(()=>Math.random()-.5);
+  document.getElementById('opts-area').innerHTML='<div class="opts-grid">'+opts.map(o=>`<button class="opt" onclick="checkMCQ(this,${o.c},'${esc(ans)}')">${o.t}</button>`).join('')+'</div>';
+}
+function renderFill(w){
+  document.getElementById('qtag').textContent='● শূন্যস্থান পূরণ';
+  document.getElementById('qtxt').textContent='নিচের বাক্যে শূন্যস্থানে কোন শব্দটি বসবে?';
+  const bl=w.sentence.replace(new RegExp('\\b'+w.word+'\\b','gi'),'______');
+  const se=document.getElementById('qsent');se.textContent=bl;se.style.display='block';
+  document.getElementById('opts-area').innerHTML=`<input class="fill-input" id="fi" placeholder="উত্তর লেখো..." autocomplete="off"><button class="btn-submit" onclick="checkFill('${esc(w.word)}','${esc(w.meaning)}')">জমা দাও ✓</button>`;
+  document.getElementById('fi').addEventListener('keydown',e=>{if(e.key==='Enter')checkFill(w.word,w.meaning);});
+  setTimeout(()=>document.getElementById('fi')?.focus(),80);
+}
+function checkMCQ(btn,ok,ans){
+  if(answered)return;answered=true;
+  document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
+  if(ok){btn.classList.add('oc');correct++;showFB(true,'✓ সঠিক উত্তর!');}
+  else{btn.classList.add('ow');wrong++;document.querySelectorAll('.opt').forEach(b=>{if(b.textContent.trim()===ans.trim())b.classList.add('oc');});showFB(false,'✗ ভুল। সঠিক: '+ans);}
+  document.getElementById('lscore').textContent=correct;
+  document.getElementById('btn-next').className='btn-next show';
+  incToday();
+}
+function checkFill(word,meaning){
+  if(answered)return;const fi=document.getElementById('fi');if(!fi)return;
+  const val=fi.value.trim().toLowerCase();const ans=word.trim().toLowerCase();
+  answered=true;fi.disabled=true;
+  if(val===ans||(ans.includes(val)&&val.length>3)){fi.classList.add('fc');correct++;showFB(true,'✓ সঠিক! — '+word+' ('+meaning+')');}
+  else{fi.classList.add('fw');wrong++;showFB(false,'✗ ভুল। সঠিক: '+word+' ('+meaning+')');}
+  document.getElementById('lscore').textContent=correct;
+  document.getElementById('btn-next').className='btn-next show';
+  incToday();
+}
+function showFB(ok,msg){const f=document.getElementById('feedback');f.textContent=msg;f.className='feedback show '+(ok?'fb-ok':'fb-no');}
+function nextQ(){curQ++;showQ();}
+function showRes(){
+  document.getElementById('qz-wrap').style.display='none';
+  document.getElementById('res-wrap').style.display='block';
+  const total=correct+wrong;const pct=total>0?Math.round(correct/total*100):0;
+  document.getElementById('rs-c').textContent=correct;document.getElementById('rs-w').textContent=wrong;document.getElementById('rs-t').textContent=total;
+  document.getElementById('res-pct').textContent=pct+'%';
+  let emoji='😢',title='আবার চেষ্টা করো';
+  if(pct>=90){emoji='🏆';title='অসাধারণ!';}else if(pct>=75){emoji='🎉';title='দারুণ!';}else if(pct>=60){emoji='👍';title='ভালো!';}else if(pct>=40){emoji='🙂';title='আরেকটু চেষ্টা।';}
+  document.getElementById('res-emoji').textContent=emoji;document.getElementById('res-title').textContent=title;
+  const prev=parseInt(localStorage.getItem('vm_quiz_best')||'0');if(pct>prev)localStorage.setItem('vm_quiz_best',pct);
+  const h=JSON.parse(localStorage.getItem('vm_quiz_history')||'[]');
+  h.unshift({date:new Date().toLocaleDateString('bn-BD'),type:qType,pct,correct,total});
+  localStorage.setItem('vm_quiz_history',JSON.stringify(h.slice(0,20)));
+}
+
+/* SPEED */
+function startSpeed(){
+  document.getElementById('setup').style.display='none';
+  document.getElementById('sp-wrap').style.display='block';
+  spTime=60;spScore=0;spC=0;spW=0;updateSP();showSPQ();
+  spTimer=setInterval(()=>{
+    spTime--;document.getElementById('sp-time').textContent=spTime;
+    const off=207-(207*(spTime/60));document.getElementById('tp-ring').style.strokeDashoffset=off;
+    if(spTime<=0){clearInterval(spTimer);endSpeed();}
+  },1000);
+}
+function showSPQ(){
+  const w=words[Math.floor(Math.random()*words.length)];
+  document.getElementById('sp-word').textContent=w.word;speak(w.word);
+  const dis=words.filter(x=>x.id!==w.id).sort(()=>Math.random()-.5).slice(0,3);
+  const opts=[{t:w.meaning,c:true},...dis.map(d=>({t:d.meaning,c:false}))].sort(()=>Math.random()-.5);
+  document.getElementById('sp-opts').innerHTML=opts.map(o=>`<button class="sp-opt" onclick="checkSP(this,${o.c})">${o.t}</button>`).join('');
+}
+function checkSP(btn,ok){
+  document.querySelectorAll('.sp-opt').forEach(b=>b.disabled=true);
+  if(ok){btn.classList.add('sc');spScore+=10;spC++;}else{btn.classList.add('sw');spW++;spScore=Math.max(0,spScore-3);}
+  updateSP();incToday();setTimeout(showSPQ,550);
+}
+function updateSP(){document.getElementById('sp-sc').textContent=spScore;document.getElementById('sp-c').textContent=spC;document.getElementById('sp-w').textContent=spW;}
+function endSpeed(){
+  document.getElementById('sp-wrap').style.display='none';
+  document.getElementById('sp-res').style.display='block';
+  document.getElementById('sp-final').textContent=spScore;document.getElementById('sp-rc').textContent=spC;document.getElementById('sp-rw').textContent=spW;
+  const prev=parseInt(localStorage.getItem('vm_speed_best')||'0');if(spScore>prev)localStorage.setItem('vm_speed_best',spScore);
+  const h=JSON.parse(localStorage.getItem('vm_quiz_history')||'[]');
+  h.unshift({date:new Date().toLocaleDateString('bn-BD'),type:'speed',pct:spScore,correct:spC,total:spC+spW});
+  localStorage.setItem('vm_quiz_history',JSON.stringify(h.slice(0,20)));
+}
+function esc(s){return(s||'').replace(/'/g,"\\'").replace(/"/g,'\\"');}
+</script>
+</body></html>

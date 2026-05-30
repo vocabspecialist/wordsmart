@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="bn"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>অগ্রগতি — শব্দভান্ডার</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.big-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.85rem;margin-bottom:1.25rem;}
+@media(max-width:600px){.big-stats{grid-template-columns:repeat(2,1fr);}}
+.sc{background:white;border:2px solid var(--ink);border-radius:var(--r);padding:1.25rem;text-align:center;transition:background .3s,border-color .3s;}
+.sc.feat{background:var(--ink);color:white;}
+.sc-num{font-family:'JetBrains Mono',monospace;font-size:2rem;font-weight:600;display:block;margin-bottom:.15rem;}
+.sc.feat .sc-num{color:var(--gold);}
+.sc-lbl{font-size:.75rem;color:var(--muted);}
+.sc.feat .sc-lbl{color:rgba(255,255,255,.5);}
+.prog-card{background:white;border:2px solid var(--ink);border-radius:var(--r);padding:1.5rem;margin-bottom:1.25rem;transition:background .3s,border-color .3s;}
+.prog-card h3{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;margin-bottom:.3rem;}
+.prog-sub{font-size:.82rem;color:var(--muted);margin-bottom:.9rem;}
+.big-bar{background:var(--paper-warm);border-radius:100px;height:20px;overflow:hidden;margin-bottom:.65rem;position:relative;}
+.big-bar-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--accent3),var(--accent2));transition:width 1s ease;}
+.big-bar-lbl{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;color:var(--ink);}
+[data-theme="dark"] .big-bar-lbl{color:white;}
+/* TABS */
+.tabs{display:flex;gap:.3rem;border-bottom:2px solid var(--paper-warm);margin-bottom:1.5rem;overflow-x:auto;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{padding:.55rem 1.1rem;border-radius:8px 8px 0 0;border:2px solid transparent;border-bottom:none;font-family:'Hind Siliguri',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;color:var(--muted);background:none;margin-bottom:-2px;white-space:nowrap;transition:all .2s;}
+.tab.active{background:white;border-color:var(--ink);color:var(--ink);}
+[data-theme="dark"] .tab.active{background:#1a1a2e;border-color:#3a3a5e;}
+.tp{display:none;}.tp.active{display:block;}
+/* HEATMAP */
+.hm-card{background:white;border:2px solid var(--ink);border-radius:var(--r);padding:1.5rem;margin-bottom:1.25rem;transition:background .3s,border-color .3s;}
+.hm-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;margin-bottom:1rem;}
+.hm-wrap{overflow-x:auto;padding-bottom:.5rem;}
+.hm-grid{display:flex;gap:3px;}
+.hm-col{display:flex;flex-direction:column;gap:3px;}
+.hm-cell{width:12px;height:12px;border-radius:2px;cursor:default;transition:transform .1s;}
+.hm-cell:hover{transform:scale(1.5);z-index:5;position:relative;}
+.hm0{background:#eee;}[data-theme="dark"] .hm0{background:#2a2a3e;}
+.hm1{background:#c6e6d8;}.hm2{background:#7ecba1;}.hm3{background:#3daf73;}.hm4{background:#1a7a44;}
+.hm-legend{display:flex;align-items:center;gap:.3rem;margin-top:.6rem;font-size:.72rem;color:var(--muted);}
+/* LETTER GRID */
+.lg{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:.45rem;margin-bottom:1.25rem;}
+.lc{background:white;border:1.5px solid var(--paper-warm);border-radius:9px;padding:.55rem;text-align:center;transition:background .3s,border-color .3s;}
+.lc-l{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:.95rem;color:var(--ink);}
+.lc-bar{height:4px;background:var(--paper-warm);border-radius:100px;margin:.3rem 0;overflow:hidden;}
+.lc-fill{height:100%;background:var(--accent3);border-radius:100px;}
+.lc-p{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--muted);}
+/* HARD */
+.hard-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.45rem;margin-bottom:1.25rem;}
+.hc{background:#fde8e4;border:1.5px solid #f5b8b0;border-radius:8px;padding:.45rem .65rem;font-size:.82rem;font-weight:600;color:var(--accent);cursor:pointer;transition:all .2s;text-align:center;}
+.hc:hover{background:var(--accent);color:white;}
+.hc-m{font-size:.68rem;color:var(--muted);font-weight:400;margin-top:.08rem;}
+.hc:hover .hc-m{color:rgba(255,255,255,.7);}
+/* TRACKER */
+.tracker-controls{display:flex;gap:.6rem;margin-bottom:.9rem;flex-wrap:wrap;align-items:center;}
+.search-track{padding:.48rem .9rem;border:2px solid var(--ink);border-radius:8px;font-family:'Hind Siliguri',sans-serif;font-size:.88rem;flex:1;min-width:160px;background:white;color:var(--text);}
+.search-track:focus{outline:none;border-color:var(--accent2);}
+.track-table-wrap{overflow-x:auto;}
+.track-table{width:100%;border-collapse:collapse;min-width:520px;}
+.track-table th{text-align:left;padding:.55rem .9rem;font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);border-bottom:2px solid var(--ink);}
+.track-table td{padding:.62rem .9rem;border-bottom:1px solid var(--paper-warm);font-size:.85rem;vertical-align:middle;}
+.track-table tr:hover td{background:var(--paper-warm);}
+.sbadge{display:inline-flex;align-items:center;gap:.25rem;padding:.15rem .6rem;border-radius:100px;font-size:.72rem;font-weight:600;}
+.sb-l{background:#d4edda;color:#155724;}.sb-h{background:#fde8e4;color:#c84b31;}.sb-n{background:#e8f4fd;color:#1565c0;}
+.t-spk{background:none;border:none;cursor:pointer;font-size:.85rem;opacity:.6;transition:opacity .2s;}
+.t-spk:hover{opacity:1;}
+.tl-btn{padding:.18rem .6rem;border-radius:5px;border:1.5px solid;font-size:.72rem;font-weight:600;cursor:pointer;font-family:'Hind Siliguri',sans-serif;transition:all .2s;}
+.tl-add{border-color:var(--accent3);color:var(--accent3);background:none;}
+.tl-add:hover{background:var(--accent3);color:white;}
+.tl-rm{border-color:var(--accent);color:var(--accent);background:none;}
+.tl-rm:hover{background:var(--accent);color:white;}
+/* HISTORY */
+.hist-item{background:white;border:1.5px solid var(--paper-warm);border-radius:10px;padding:.8rem 1.1rem;margin-bottom:.45rem;display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;transition:background .3s,border-color .3s;}
+.hist-score{font-family:'JetBrains Mono',monospace;font-size:.92rem;font-weight:600;padding:.18rem .65rem;border-radius:100px;}
+.hs-hi{background:#d4edda;color:#155724;}.hs-mi{background:#fff3cd;color:#856404;}.hs-lo{background:#f8d7da;color:#721c24;}
+/* DANGER */
+.dz{background:white;border:2px solid #f5b8b0;border-radius:var(--r);padding:1.25rem;display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;margin-bottom:.75rem;transition:background .3s;}
+.dz-btn{padding:.5rem 1.1rem;background:white;border:2px solid var(--accent);color:var(--accent);border-radius:8px;font-family:'Hind Siliguri',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;}
+.dz-btn:hover{background:var(--accent);color:white;}
+.empty-msg{color:var(--muted);font-size:.88rem;padding:.75rem 0;}
+</style>
+</head><body>
+<nav>
+  <a href="index.html" class="nav-logo">শব্দ<span>ভান্ডার</span><small>Word Smart I & II</small></a>
+  <ul id="desktop-nav"></ul><button id="hamburger" onclick="toggleMNav()">☰</button>
+</nav>
+<div id="mobile-nav"></div>
+<div class="wrap">
+  <div class="page-title">অগ্রগতি 📊</div>
+  <div class="page-sub">সব পরিসংখ্যান।</div>
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('overview',this)">📈 সংক্ষিপ্ত</button>
+    <button class="tab" onclick="switchTab('tracker',this)">📋 শব্দ ট্র্যাকার</button>
+    <button class="tab" onclick="switchTab('history',this)">📝 পরীক্ষার ইতিহাস</button>
+    <button class="tab" onclick="switchTab('settings',this)">⚙️ সেটিংস</button>
+  </div>
+
+  <!-- OVERVIEW -->
+  <div class="tp active" id="tab-overview">
+    <div class="big-stats">
+      <div class="sc feat"><span class="sc-num" id="s-l">০</span><div class="sc-lbl">শেখা শব্দ</div></div>
+      <div class="sc"><span class="sc-num" id="s-r" style="color:var(--accent)">—</span><div class="sc-lbl">বাকি</div></div>
+      <div class="sc"><span class="sc-num" id="s-h" style="color:var(--gold)">০</span><div class="sc-lbl">কঠিন শব্দ</div></div>
+      <div class="sc"><span class="sc-num" id="s-s" style="color:var(--accent2)">০</span><div class="sc-lbl">Streak 🔥</div></div>
+    </div>
+    <div class="prog-card">
+      <h3>মোট সম্পূর্ণতা</h3>
+      <div class="prog-sub" id="prog-sub">লোড হচ্ছে...</div>
+      <div class="big-bar"><div class="big-bar-fill" id="bf" style="width:0%"></div><div class="big-bar-lbl" id="bbl">০%</div></div>
+      <div style="display:flex;gap:1.1rem;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:.3rem;font-size:.8rem;color:var(--muted)"><div style="width:9px;height:9px;border-radius:50%;background:var(--accent3)"></div>শেখা</div>
+        <div style="display:flex;align-items:center;gap:.3rem;font-size:.8rem;color:var(--muted)"><div style="width:9px;height:9px;border-radius:50%;background:var(--accent)"></div>কঠিন</div>
+        <div style="display:flex;align-items:center;gap:.3rem;font-size:.8rem;color:var(--muted)"><div style="width:9px;height:9px;border-radius:50%;background:var(--paper-warm)"></div>অদেখা</div>
+      </div>
+    </div>
+    <div class="hm-card">
+      <div class="hm-title">📅 দৈনিক অনুশীলন (গত ৩ মাস)</div>
+      <div class="hm-wrap" id="hm-wrap"></div>
+      <div class="hm-legend"><span>কম</span><div class="hm-cell hm0"></div><div class="hm-cell hm1"></div><div class="hm-cell hm2"></div><div class="hm-cell hm3"></div><div class="hm-cell hm4"></div><span>বেশি</span></div>
+    </div>
+    <div class="sec-lbl">বর্ণ অনুযায়ী অগ্রগতি</div>
+    <div class="lg" id="letter-grid"></div>
+    <div class="sec-lbl">কঠিন শব্দ</div>
+    <div class="hard-grid" id="hard-list"></div>
+    <div class="sec-lbl">কুইজ ইতিহাস</div>
+    <div id="quiz-hist"></div>
+  </div>
+
+  <!-- TRACKER -->
+  <div class="tp" id="tab-tracker">
+    <div class="tracker-controls">
+      <input class="search-track" id="tsearch" placeholder="🔍 শব্দ খোঁজো..." oninput="renderTracker()">
+      <button class="filter-pill active" onclick="setTF('all',this)">সব</button>
+      <button class="filter-pill" onclick="setTF('learned',this)">✓ শেখা</button>
+      <button class="filter-pill" onclick="setTF('hard',this)">⚠ কঠিন</button>
+      <button class="filter-pill" onclick="setTF('new',this)">◎ নতুন</button>
+    </div>
+    <div class="track-table-wrap">
+      <table class="track-table">
+        <thead><tr><th>#</th><th>শব্দ</th><th>অর্থ</th><th>অবস্থা</th><th>SRS</th><th>পরবর্তী রিভিউ</th><th>কাজ</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div id="t-empty" class="empty-msg" style="display:none">কোনো শব্দ পাওয়া যায়নি।</div>
+    <div id="t-count" style="margin-top:.6rem;font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--muted);"></div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="tp" id="tab-history">
+    <div class="sec-lbl">পরীক্ষার ইতিহাস</div>
+    <div id="exam-hist"></div>
+    <div class="sec-lbl" style="margin-top:1.25rem">কুইজ ইতিহাস</div>
+    <div id="quiz-hist-2"></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="tp" id="tab-settings">
+    <div class="sec-lbl">ডেটা ব্যবস্থাপনা</div>
+    <div class="dz"><div><strong>শেখা ডেটা ও SRS রিসেট</strong><p style="color:var(--muted);font-size:.82rem;margin-top:.2rem">সব "শিখেছি" চিহ্ন মুছবে।</p></div><button class="dz-btn" onclick="resetLearned()">🗑️ রিসেট</button></div>
+    <div class="dz"><div><strong>পরীক্ষা ও কুইজ ইতিহাস মুছুন</strong></div><button class="dz-btn" onclick="resetHistory()">🗑️ রিসেট</button></div>
+    <div class="dz"><div><strong>সম্পূর্ণ রিসেট</strong><p style="color:var(--muted);font-size:.82rem;margin-top:.2rem">সব ডেটা মুছবে।</p></div><button class="dz-btn" onclick="resetAll()">⚠️ সব মুছুন</button></div>
+  </div>
+</div>
+<footer><strong>শব্দভান্ডার</strong> — ডেভেলপ করেছেন - কামরুল হাসান</footer>
+
+<script src="words_data.js"></script><script src="theme.js"></script><script src="nav.js"></script>
+<script>
+initNav('progress.html');initTheme();
+const words=WORDS_DATA;
+let learned={},hard={},srs={},tf='all';
+
+function init(){
+  learned=JSON.parse(localStorage.getItem('vm_learned')||'{}');
+  hard=JSON.parse(localStorage.getItem('vm_hard')||'{}');
+  srs=JSON.parse(localStorage.getItem('vm_srs')||'{}');
+  renderOverview();renderHeatmap();renderTracker();renderHistory();
+}
+
+function renderOverview(){
+  const lc=Object.values(learned).filter(Boolean).length;
+  const hc=Object.values(hard).filter(Boolean).length;
+  const streak=parseInt(localStorage.getItem('vm_streak')||'0');
+  const pct=Math.round(lc/1038*100);
+  document.getElementById('s-l').textContent=lc;
+  document.getElementById('s-r').textContent=1038-lc;
+  document.getElementById('s-h').textContent=hc;
+  document.getElementById('s-s').textContent=streak;
+  document.getElementById('prog-sub').textContent=`১০৩৮টির মধ্যে ${lc}টি শেখা। ${1038-lc}টি বাকি।`;
+  document.getElementById('bf').style.width=pct+'%';
+  document.getElementById('bbl').textContent=pct+'%';
+  // letter grid
+  document.getElementById('letter-grid').innerHTML='ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(l=>{
+    const total=words.filter(w=>w.word.toUpperCase().startsWith(l));
+    const done=total.filter(w=>learned[w.id]);
+    if(!total.length)return'';
+    const p=Math.round(done.length/total.length*100);
+    return`<div class="lc"><div class="lc-l">${l}</div><div class="lc-bar"><div class="lc-fill" style="width:${p}%"></div></div><div class="lc-p">${done.length}/${total.length}</div></div>`;
+  }).join('');
+  // hard
+  const hw=words.filter(w=>hard[w.id]);
+  document.getElementById('hard-list').innerHTML=hw.length?hw.map(w=>`<div class="hc" onclick="location.href='dictionary.html'"><div>${w.word}</div><div class="hc-m">${w.meaning}</div></div>`).join(''):'<div class="empty-msg">👏 কোনো কঠিন শব্দ নেই!</div>';
+  // quiz hist
+  const h=JSON.parse(localStorage.getItem('vm_quiz_history')||'[]');
+  const tn={mcq:'MCQ',synonym:'সিনোনিম',antonym:'এন্টোনিম',fill:'শূন্যস্থান',speed:'Speed'};
+  document.getElementById('quiz-hist').innerHTML=h.length?h.slice(0,8).map(x=>{const cls=x.pct>=75?'hs-hi':x.pct>=50?'hs-mi':'hs-lo';return`<div class="hist-item"><span style="font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted)">${x.date}</span><span style="font-size:.85rem;font-weight:600">${tn[x.type]||x.type}</span><span>${x.correct}/${x.total}</span><span class="hist-score ${cls}">${x.pct}%</span></div>`;}).join(''):'<div class="empty-msg">এখনো কোনো কুইজ নেই।</div>';
+}
+
+function renderHeatmap(){
+  const dc=JSON.parse(localStorage.getItem('vm_daily_counts')||'{}');
+  const today=new Date();today.setHours(0,0,0,0);
+  const days=84;const cells=[];
+  for(let i=days-1;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);cells.push({date:d,count:dc[d.toDateString()]||0});}
+  const mx=Math.max(...cells.map(c=>c.count),1);
+  function lv(c){if(!c)return'hm0';const r=c/mx;if(r<.25)return'hm1';if(r<.5)return'hm2';if(r<.75)return'hm3';return'hm4';}
+  const weeks=[];let wk=[];
+  const fd=cells[0].date.getDay();
+  for(let i=0;i<fd;i++)wk.push(null);
+  cells.forEach(c=>{wk.push(c);if(wk.length===7){weeks.push(wk);wk=[];}});
+  if(wk.length)weeks.push(wk);
+  const mn=['জান','ফেব','মার','এপ্র','মে','জুন','জুল','আগ','সেপ','অক্ট','নভ','ডিস'];
+  let html='<div style="display:flex;gap:3px;">';
+  html+='<div style="display:flex;flex-direction:column;gap:3px;margin-right:3px;margin-top:18px;">';
+  ['রবি','','মঙ্গ','','বৃহ','','শনি'].forEach(d=>`<div style="height:12px;font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--muted);display:flex;align-items:center">${d}</div>`).forEach(s=>html+=s);
+  html+='</div><div><div style="display:flex;gap:3px;margin-bottom:3px;">';
+  weeks.forEach(w=>{const fr=w.find(c=>c);const lb=fr&&fr.date.getDate()<=7?mn[fr.date.getMonth()]:'';html+=`<div style="width:12px;font-family:'JetBrains Mono',monospace;font-size:.52rem;color:var(--muted);text-align:center;overflow:hidden">${lb}</div>`;});
+  html+='</div><div class="hm-grid">';
+  weeks.forEach(w=>{html+='<div class="hm-col">';w.forEach(c=>{if(!c){html+='<div style="width:12px;height:12px"></div>';return;}html+=`<div class="hm-cell ${lv(c.count)}" title="${c.date.toLocaleDateString('bn-BD')}: ${c.count}টি"></div>`;});html+='</div>';});
+  html+='</div></div></div>';
+  document.getElementById('hm-wrap').innerHTML=html;
+}
+
+function setTF(f,btn){tf=f;document.querySelectorAll('.filter-pill').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderTracker();}
+function renderTracker(){
+  const q=document.getElementById('tsearch').value.toLowerCase().trim();
+  const now=Date.now();
+  let fl=words.filter(w=>{
+    if(q&&!w.word.toLowerCase().includes(q)&&!w.meaning.includes(q))return false;
+    if(tf==='learned')return learned[w.id];
+    if(tf==='hard')return hard[w.id];
+    if(tf==='new')return!learned[w.id]&&!hard[w.id];
+    return true;
+  });
+  const sl=fl.slice(0,200);
+  document.getElementById('t-empty').style.display=fl.length?'none':'block';
+  document.getElementById('t-count').textContent=fl.length+'টি শব্দ';
+  document.getElementById('tbody').innerHTML=sl.map(w=>{
+    const isL=learned[w.id],isH=hard[w.id];
+    const badge=isL?'<span class="sbadge sb-l">✓ শেখা</span>':isH?'<span class="sbadge sb-h">⚠ কঠিন</span>':'<span class="sbadge sb-n">◎ নতুন</span>';
+    const c=srs[w.id];
+    const srsLvl=!c?'নতুন':c.reps<2?'শেখা হচ্ছে':c.reps<5?'মাঝারি':'দক্ষ';
+    const diff=c?c.nextReview-now:null;
+    const nxt=!diff?'—':diff<=0?'<span style="color:var(--accent);font-weight:700">আজই!</span>':Math.ceil(diff/86400000)+'d পর';
+    const btn=isL?`<button class="tl-btn tl-rm" onclick="tlToggle(${w.id},this)">✗ বাদ</button>`:`<button class="tl-btn tl-add" onclick="tlToggle(${w.id},this)">+ শিখেছি</button>`;
+    return`<tr><td style="font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted)">${w.id}</td><td><strong>${w.word}</strong> <button class="t-spk" onclick="speak('${w.word}')">🔊</button></td><td style="color:var(--muted);font-size:.82rem">${w.meaning}</td><td>${badge}</td><td style="font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--muted)">${srsLvl}</td><td style="font-family:'JetBrains Mono',monospace;font-size:.75rem">${nxt}</td><td>${btn}</td></tr>`;
+  }).join('');
+}
+function tlToggle(id){
+  learned[id]=!learned[id];localStorage.setItem('vm_learned',JSON.stringify(learned));
+  if(learned[id]){delete hard[id];localStorage.setItem('vm_hard',JSON.stringify(hard));}
+  renderTracker();renderOverview();
+}
+
+function renderHistory(){
+  const eh=JSON.parse(localStorage.getItem('vm_exam_history')||'[]');
+  document.getElementById('exam-hist').innerHTML=eh.length?eh.map(h=>{const cls=h.pct>=70?'hs-hi':h.pct>=50?'hs-mi':'hs-lo';return`<div class="hist-item"><span style="font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted)">${h.date}</span><span style="font-size:.82rem">${h.total}টি প্রশ্ন</span><span>✓${h.correct} ✗${h.wrong} ⊘${h.skip}</span><span style="font-size:.82rem">${h.score}/${h.maxScore}</span><span class="hist-score ${cls}">${h.pct}%</span></div>`;}).join(''):'<div class="empty-msg">এখনো কোনো পরীক্ষা নেই। <a href="exam.html" style="color:var(--accent2)">পরীক্ষা দাও →</a></div>';
+  const qh=JSON.parse(localStorage.getItem('vm_quiz_history')||'[]');
+  const tn={mcq:'MCQ',synonym:'সিনোনিম',antonym:'এন্টোনিম',fill:'শূন্যস্থান',speed:'Speed'};
+  document.getElementById('quiz-hist-2').innerHTML=qh.length?qh.map(x=>{const cls=x.pct>=75?'hs-hi':x.pct>=50?'hs-mi':'hs-lo';return`<div class="hist-item"><span style="font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted)">${x.date}</span><span style="font-weight:600;font-size:.85rem">${tn[x.type]||x.type}</span><span>${x.correct}/${x.total}</span><span class="hist-score ${cls}">${x.pct}%</span></div>`;}).join(''):'<div class="empty-msg">কোনো কুইজ নেই।</div>';
+}
+
+function switchTab(id,btn){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tp').forEach(p=>p.classList.remove('active'));btn.classList.add('active');document.getElementById('tab-'+id).classList.add('active');}
+function resetLearned(){if(!confirm('শেখা ডেটা মুছবে?'))return;['vm_learned','vm_srs','vm_hard','vm_streak','vm_last_day','vm_daily_counts'].forEach(k=>localStorage.removeItem(k));init();}
+function resetHistory(){if(!confirm('ইতিহাস মুছবে?'))return;['vm_quiz_history','vm_exam_history','vm_quiz_best','vm_speed_best'].forEach(k=>localStorage.removeItem(k));renderHistory();}
+function resetAll(){if(!confirm('সব ডেটা মুছবে?'))return;['vm_learned','vm_srs','vm_hard','vm_streak','vm_last_day','vm_daily_counts','vm_quiz_history','vm_exam_history','vm_quiz_best','vm_speed_best','vm_daily_goal'].forEach(k=>localStorage.removeItem(k));learned={};hard={};srs={};init();alert('সব মুছে গেছে।');}
+init();
+</script>
+</body></html>

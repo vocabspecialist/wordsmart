@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="bn"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ফ্ল্যাশকার্ড — শব্দভান্ডার</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.controls{display:flex;align-items:center;justify-content:space-between;gap:.6rem;margin-bottom:.9rem;flex-wrap:wrap;}
+.mode-pills{display:flex;gap:.35rem;flex-wrap:wrap;}
+.counter{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--muted);}
+.srs-info{background:var(--paper-warm);border-radius:9px;padding:.55rem 1rem;font-size:.76rem;color:var(--muted);display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:.9rem;align-items:center;}
+.srs-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:3px;flex-shrink:0;}
+.sess-bar{background:var(--paper-warm);border-radius:100px;height:5px;margin-bottom:1.25rem;overflow:hidden;}
+.sess-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--gold));border-radius:100px;transition:width .5s ease;}
+/* CARD */
+.scene{perspective:1200px;height:340px;margin-bottom:1.2rem;cursor:pointer;}
+@media(max-width:480px){.scene{height:300px;}}
+.card-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.4,0,.2,1);}
+.card-inner.flipped{transform:rotateY(180deg);}
+.face{position:absolute;inset:0;border-radius:20px;border:2.5px solid var(--ink);backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center;overflow:hidden;}
+.card-front{background:white;box-shadow:7px 7px 0 var(--ink);}
+.card-back{background:var(--ink);color:white;transform:rotateY(180deg);box-shadow:7px 7px 0 var(--accent);}
+.f-num{position:absolute;top:1rem;left:1.25rem;font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:600;color:var(--muted);}
+.card-back .f-num{color:rgba(255,255,255,.3);}
+.f-badge{position:absolute;top:1rem;right:1.25rem;font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:600;padding:.18rem .55rem;border-radius:100px;}
+.bn{background:#e3f2fd;color:#1565c0;}.bl{background:#fff3e0;color:#e65100;}.br{background:#e8f5e9;color:#2e7d32;}
+.f-hint{position:absolute;bottom:1rem;right:1.25rem;font-size:.72rem;color:var(--muted);}
+.card-back .f-hint{color:rgba(255,255,255,.3);}
+.cword{font-family:'Playfair Display',serif;font-size:clamp(2rem,6vw,3rem);font-weight:900;color:var(--ink);line-height:1.1;margin-bottom:.4rem;}
+.caudio{background:var(--paper-warm);border:2px solid var(--ink);border-radius:7px;padding:.35rem .85rem;font-size:.85rem;cursor:pointer;margin-top:.4rem;transition:all .2s;color:var(--text);font-family:'Hind Siliguri',sans-serif;font-weight:600;}
+.caudio:hover{background:var(--ink);color:white;}
+.csent{font-size:.82rem;color:var(--muted);font-style:italic;line-height:1.55;max-width:460px;margin-top:.65rem;}
+.bmeaning{font-size:1.5rem;font-weight:700;margin-bottom:.9rem;color:var(--gold);}
+.wgroups{display:flex;gap:1.25rem;justify-content:center;flex-wrap:wrap;width:100%;margin-bottom:.65rem;}
+.wg-lbl{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:.35rem;}
+.wg-words{display:flex;flex-wrap:wrap;gap:.28rem;}
+.chip{padding:.18rem .55rem;border-radius:5px;font-size:.76rem;font-weight:500;}
+.chip-s{background:rgba(76,175,125,.25);color:#7dffb8;}
+.chip-a{background:rgba(200,75,49,.3);color:#ffaa99;}
+.bsent{font-size:.8rem;color:rgba(255,255,255,.4);font-style:italic;line-height:1.5;max-width:460px;margin-top:.5rem;}
+/* SRS BUTTONS */
+.srs-row{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-bottom:.85rem;}
+@media(max-width:420px){.srs-row{grid-template-columns:repeat(2,1fr);}}
+.srs-btn{padding:.75rem .4rem;border-radius:11px;border:2.5px solid var(--ink);font-family:'Hind Siliguri',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .2s;text-align:center;}
+.srs-btn:hover{transform:translateY(-2px);}
+.sb0{background:#fde8e4;color:#c84b31;border-color:#c84b31;}
+.sb1{background:#fff3cd;color:#856404;border-color:#d4a843;}
+.sb2{background:#d4edda;color:#155724;border-color:#4caf7d;}
+.sb3{background:#cce5ff;color:#004085;border-color:#2e86ab;}
+.srs-sub{font-size:.6rem;font-weight:400;opacity:.7;display:block;margin-top:.12rem;}
+.pre-row{display:flex;justify-content:center;margin-bottom:.85rem;}
+.btn-flip{padding:.9rem 2rem;border-radius:11px;border:2.5px solid var(--ink);font-family:'Hind Siliguri',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;background:white;color:var(--ink);transition:all .2s;min-width:200px;}
+.btn-flip:hover{background:var(--paper-warm);}
+.mini-bar{display:flex;gap:.85rem;justify-content:center;align-items:center;flex-wrap:wrap;}
+.mini-s{display:flex;align-items:center;gap:.35rem;font-size:.8rem;color:var(--muted);}
+.m-dot{width:7px;height:7px;border-radius:50%;}
+.key-hints{display:flex;gap:.75rem;justify-content:center;margin-top:.85rem;flex-wrap:wrap;}
+.kh{font-family:'JetBrains Mono',monospace;font-size:.67rem;color:var(--muted);display:flex;align-items:center;gap:.25rem;}
+.key{background:var(--paper-warm);border:1px solid #ccc;border-radius:3px;padding:.08rem .36rem;}
+/* DONE */
+.done-card{background:white;border:2.5px solid var(--ink);border-radius:20px;padding:2.5rem 1.5rem;box-shadow:7px 7px 0 var(--ink);text-align:center;display:none;}
+.done-emoji{font-size:3.5rem;margin-bottom:.75rem;}
+.done-title{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;margin-bottom:.4rem;}
+.done-stats{display:flex;gap:1.75rem;justify-content:center;margin:1.25rem 0;flex-wrap:wrap;}
+.ds-num{font-family:'JetBrains Mono',monospace;font-size:1.8rem;font-weight:600;}
+.ds-lbl{font-size:.78rem;color:var(--muted);}
+</style>
+</head><body>
+<nav>
+  <a href="index.html" class="nav-logo">শব্দ<span>ভান্ডার</span><small>Word Smart I & II</small></a>
+  <ul id="desktop-nav"></ul><button id="hamburger" onclick="toggleMNav()">☰</button>
+</nav>
+<div id="mobile-nav"></div>
+<div class="wrap">
+  <div class="controls">
+    <div class="mode-pills">
+      <button class="pill" onclick="setMode('srs',this)">🔬 SRS</button>
+      <button class="pill active" onclick="setMode('all',this)">সব</button>
+      <button class="pill" onclick="setMode('unseen',this)">না-দেখা</button>
+      <button class="pill" onclick="setMode('hard',this)">কঠিন</button>
+    </div>
+    <div class="counter"><strong id="ci">১</strong>/<span id="ct">—</span></div>
+  </div>
+  <div class="srs-info">
+    <span><span class="srs-dot" style="background:#1565c0"></span>নতুন: <strong id="sn">—</strong></span>
+    <span><span class="srs-dot" style="background:#e65100"></span>শেখা হচ্ছে: <strong id="sl">—</strong></span>
+    <span><span class="srs-dot" style="background:#2e7d32"></span>রিভিউ: <strong id="sr">—</strong></span>
+    <span style="margin-left:auto;font-size:.7rem">⌨ Space=উল্টাও · 1/2/3/4=মূল্যায়ন · P=উচ্চারণ</span>
+  </div>
+  <div class="sess-bar"><div class="sess-fill" id="sf" style="width:0%"></div></div>
+
+  <div class="scene" onclick="flipCard()" id="scene">
+    <div class="card-inner" id="ci2">
+      <div class="face card-front">
+        <div class="f-num" id="fn">#001</div>
+        <div class="f-badge bn" id="fb">নতুন</div>
+        <div class="cword" id="cw">—</div>
+        <button class="caudio" id="cab" onclick="event.stopPropagation();speakCur()">🔊 উচ্চারণ</button>
+        <div class="csent" id="cs"></div>
+        <div class="f-hint">👆 ক্লিক = উল্টাও</div>
+      </div>
+      <div class="face card-back">
+        <div class="f-num" id="fnb">#001</div>
+        <div class="bmeaning" id="bm">—</div>
+        <div class="wgroups" id="wg"></div>
+        <div class="bsent" id="bs"></div>
+        <div class="f-hint">অর্থ ও সম্পর্কিত শব্দ</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pre-row" id="pre-row"><button class="btn-flip" onclick="flipCard()">↩ উল্টে অর্থ দেখো</button></div>
+  <div class="srs-row" id="srs-row" style="display:none">
+    <button class="srs-btn sb0" onclick="rate(0)">✗ ভুলেছি<span class="srs-sub">আবার শুরু</span></button>
+    <button class="srs-btn sb1" onclick="rate(1)">😓 কঠিন<span class="srs-sub">শীঘ্রই আসবে</span></button>
+    <button class="srs-btn sb2" onclick="rate(2)">✓ ভালো<span class="srs-sub">স্বাভাবিক</span></button>
+    <button class="srs-btn sb3" onclick="rate(3)">⚡ সহজ<span class="srs-sub">দেরিতে আসবে</span></button>
+  </div>
+  <div class="mini-bar">
+    <div class="mini-s"><div class="m-dot" style="background:var(--accent3)"></div><span id="mc">০</span> ভালো</div>
+    <div class="mini-s"><div class="m-dot" style="background:var(--gold)"></div><span id="mh">০</span> কঠিন</div>
+    <div class="mini-s"><div class="m-dot" style="background:var(--accent)"></div><span id="mf">০</span> ভুলেছি</div>
+  </div>
+  <div class="key-hints">
+    <span class="kh"><span class="key">Space</span>উল্টাও</span>
+    <span class="kh"><span class="key">1</span>ভুলেছি</span>
+    <span class="kh"><span class="key">2</span>কঠিন</span>
+    <span class="kh"><span class="key">3</span>ভালো</span>
+    <span class="kh"><span class="key">4</span>সহজ</span>
+    <span class="kh"><span class="key">P</span>উচ্চারণ</span>
+  </div>
+
+  <div class="done-card" id="done-card">
+    <div class="done-emoji">🎉</div>
+    <div class="done-title">সেশন শেষ!</div>
+    <p style="color:var(--muted);margin-bottom:.5rem">SRS অনুযায়ী পরবর্তী রিভিউ নির্ধারিত হয়েছে।</p>
+    <div class="done-stats">
+      <div><div class="ds-num" style="color:var(--accent2)" id="de">০</div><div class="ds-lbl">ভালো/সহজ</div></div>
+      <div><div class="ds-num" style="color:var(--gold)" id="dh">০</div><div class="ds-lbl">কঠিন</div></div>
+      <div><div class="ds-num" style="color:var(--accent)" id="df">০</div><div class="ds-lbl">ভুলেছি</div></div>
+    </div>
+    <button class="btn-main" style="margin-bottom:.5rem" onclick="restart('srs')">🔬 SRS মোডে আবার</button>
+    <button class="btn-alt" onclick="restart('all')">↩ সব শব্দ</button>
+  </div>
+</div>
+<footer><strong>শব্দভান্ডার</strong> — ডেভেলপ করেছেন - কামরুল হাসান</footer>
+
+<script src="words_data.js"></script><script src="theme.js"></script><script src="nav.js"></script>
+<script>
+initNav('flashcard.html');initTheme();
+let words=WORDS_DATA,deck=[],idx=0,flipped=false,mode='all';
+let easy=0,hard2=0,forgot=0;
+const learned=JSON.parse(localStorage.getItem('vm_learned')||'{}');
+const hardW=JSON.parse(localStorage.getItem('vm_hard')||'{}');
+
+function getSRS(){return JSON.parse(localStorage.getItem('vm_srs')||'{}')}
+function saveSRS(s){localStorage.setItem('vm_srs',JSON.stringify(s))}
+function updateSRS(id,q){
+  const s=getSRS();const now=Date.now();
+  const c=s[id]||{interval:1,easeFactor:2.5,nextReview:now,reps:0};
+  if(q<1){c.reps=0;c.interval=1;}
+  else{if(c.reps===0)c.interval=1;else if(c.reps===1)c.interval=6;else c.interval=Math.round(c.interval*c.easeFactor);
+  c.easeFactor=Math.max(1.3,c.easeFactor+0.1-(3-q)*(0.08+(3-q)*0.02));c.reps++;}
+  c.nextReview=now+c.interval*86400000;s[id]=c;saveSRS(s);
+}
+function getDue(){const s=getSRS();const now=Date.now();return words.filter(w=>{const c=s[w.id];return!c||c.nextReview<=now;});}
+function incToday(){const t=new Date().toDateString();const d=JSON.parse(localStorage.getItem('vm_daily_counts')||'{}');d[t]=(d[t]||0)+1;localStorage.setItem('vm_daily_counts',JSON.stringify(d));}
+
+function initCounts(){
+  const s=getSRS();let n=0,l=0,r=0;
+  words.forEach(w=>{const c=s[w.id];if(!c)n++;else if(c.reps<3)l++;else r++;});
+  document.getElementById('sn').textContent=n;document.getElementById('sl').textContent=l;document.getElementById('sr').textContent=r;
+}
+function buildDeck(){
+  const s=getSRS();const now=Date.now();
+  if(mode==='srs'){deck=getDue();if(!deck.length)deck=words.filter(w=>{const c=s[w.id];return!c||c.reps<3;}).slice(0,20);if(!deck.length)deck=[...words].sort(()=>Math.random()-.5).slice(0,30);}
+  else if(mode==='all')deck=[...words].sort(()=>Math.random()-.5);
+  else if(mode==='unseen')deck=words.filter(w=>!learned[w.id]).sort(()=>Math.random()-.5);
+  else deck=words.filter(w=>hardW[w.id]).sort(()=>Math.random()-.5);
+  if(!deck.length)deck=[...words].sort(()=>Math.random()-.5);
+  idx=0;easy=0;hard2=0;forgot=0;
+  document.getElementById('done-card').style.display='none';
+  document.getElementById('scene').style.display='block';
+  document.getElementById('pre-row').style.display='flex';
+  document.getElementById('srs-row').style.display='none';
+  document.getElementById('ct').textContent=deck.length;
+  upMini();
+}
+function setMode(m,btn){mode=m;document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));btn.classList.add('active');buildDeck();showCard();}
+function restart(m){const map={srs:0,all:1,unseen:2,hard:3};const btns=document.querySelectorAll('.pill');btns.forEach((b,i)=>b.classList.toggle('active',i===map[m]));mode=m;buildDeck();showCard();}
+
+function getBadge(w){const s=getSRS();const c=s[w.id];if(!c)return{cls:'bn',txt:'নতুন'};if(c.reps<3)return{cls:'bl',txt:'শেখা হচ্ছে'};const d=Math.round((c.nextReview-Date.now())/86400000);return{cls:'br',txt:d<=0?'আজকের রিভিউ':d+'d'};}
+
+function showCard(){
+  if(idx>=deck.length){showDone();return;}
+  const w=deck[idx];flipped=false;
+  document.getElementById('ci2').classList.remove('flipped');
+  document.getElementById('pre-row').style.display='flex';
+  document.getElementById('srs-row').style.display='none';
+  document.getElementById('fn').textContent='#'+String(w.id).padStart(3,'0');
+  document.getElementById('fnb').textContent='#'+String(w.id).padStart(3,'0');
+  document.getElementById('cw').textContent=w.word;
+  document.getElementById('cs').textContent=w.sentence?'"'+w.sentence+'"':'';
+  document.getElementById('bm').textContent=w.meaning;
+  document.getElementById('bs').textContent=w.sentence?'"'+w.sentence+'"':'';
+  const b=getBadge(w);const fb=document.getElementById('fb');fb.className='f-badge '+b.cls;fb.textContent=b.txt;
+  let gh='';
+  if(w.synonyms?.length)gh+=`<div><div class="wg-lbl">সিনোনিম</div><div class="wg-words">${w.synonyms.map(s=>`<span class="chip chip-s">${s}</span>`).join('')}</div></div>`;
+  if(w.antonyms?.length)gh+=`<div><div class="wg-lbl">এন্টোনিম</div><div class="wg-words">${w.antonyms.map(a=>`<span class="chip chip-a">${a}</span>`).join('')}</div></div>`;
+  document.getElementById('wg').innerHTML=gh;
+  document.getElementById('ci').textContent=idx+1;
+  document.getElementById('sf').style.width=(idx/deck.length*100)+'%';
+}
+function flipCard(){
+  flipped=!flipped;document.getElementById('ci2').classList.toggle('flipped',flipped);
+  if(flipped){document.getElementById('pre-row').style.display='none';document.getElementById('srs-row').style.display='grid';speakCur();}
+}
+function speakCur(){if(deck[idx])speak(deck[idx].word);}
+function rate(q){
+  const w=deck[idx];updateSRS(w.id,q);incToday();
+  if(q>=2){easy++;learned[w.id]=true;delete hardW[w.id];}
+  else if(q===1){hard2++;hardW[w.id]=true;}
+  else{forgot++;hardW[w.id]=true;}
+  localStorage.setItem('vm_learned',JSON.stringify(learned));
+  localStorage.setItem('vm_hard',JSON.stringify(hardW));
+  upMini();idx++;showCard();
+}
+function upMini(){document.getElementById('mc').textContent=easy;document.getElementById('mh').textContent=hard2;document.getElementById('mf').textContent=forgot;}
+function showDone(){
+  document.getElementById('scene').style.display='none';
+  document.getElementById('pre-row').style.display='none';
+  document.getElementById('srs-row').style.display='none';
+  document.getElementById('done-card').style.display='block';
+  document.getElementById('de').textContent=easy;document.getElementById('dh').textContent=hard2;document.getElementById('df').textContent=forgot;
+  document.getElementById('sf').style.width='100%';
+  const today=new Date().toDateString();const last=localStorage.getItem('vm_last_day');
+  let s=parseInt(localStorage.getItem('vm_streak')||'0');
+  if(last!==today){const y=new Date(Date.now()-86400000).toDateString();s=last===y?s+1:1;localStorage.setItem('vm_streak',s);localStorage.setItem('vm_last_day',today);}
+}
+document.addEventListener('keydown',e=>{
+  if(['INPUT','TEXTAREA'].includes(document.activeElement.tagName))return;
+  if(e.code==='Space'){e.preventDefault();flipCard();}
+  if(flipped){if(e.key==='1')rate(0);if(e.key==='2')rate(1);if(e.key==='3')rate(2);if(e.key==='4')rate(3);}
+  if(e.key.toLowerCase()==='p')speakCur();
+});
+initCounts();buildDeck();showCard();
+</script>
+</body></html>

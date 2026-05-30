@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="bn"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>পরীক্ষা — শব্দভান্ডার</title>
+<link rel="stylesheet" href="style.css">
+<style>
+/* SETUP */
+.setup-hero{text-align:center;padding:2rem 0 1.5rem;}
+.setup-hero h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,5vw,2.6rem);font-weight:900;margin-bottom:.4rem;}
+.setup-hero p{color:var(--muted);font-size:.92rem;}
+.setup-card{background:white;border:2px solid var(--ink);border-radius:var(--r);padding:1.5rem;margin-bottom:1rem;box-shadow:4px 4px 0 var(--ink);transition:background .3s,border-color .3s;}
+.field-row{display:grid;grid-template-columns:repeat(2,1fr);gap:.9rem;margin-bottom:.9rem;}
+@media(max-width:480px){.field-row{grid-template-columns:1fr;}}
+.field label{font-size:.82rem;font-weight:600;color:var(--muted);display:block;margin-bottom:.35rem;}
+.cfg-input,.cfg-select{width:100%;padding:.62rem .9rem;border:2px solid var(--ink);border-radius:9px;font-family:'Hind Siliguri',sans-serif;font-size:.95rem;background:white;color:var(--text);transition:border-color .2s;}
+.cfg-input:focus,.cfg-select:focus{outline:none;border-color:var(--accent2);}
+.hint-text{font-size:.72rem;color:var(--muted);margin-top:.28rem;}
+.marking-box{background:var(--paper-warm);border-radius:9px;padding:.85rem 1.1rem;margin-top:.7rem;display:flex;gap:1.25rem;flex-wrap:wrap;font-size:.82rem;}
+.mb-item{display:flex;align-items:center;gap:.35rem;}
+.mb-dot{width:9px;height:9px;border-radius:50%;}
+.type-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.65rem;margin-bottom:1rem;}
+@media(max-width:400px){.type-grid{grid-template-columns:1fr;}}
+.type-card{background:white;border:2.5px solid var(--ink);border-radius:11px;padding:1.1rem;cursor:pointer;transition:all .2s;text-align:center;}
+.type-card:hover{transform:translateY(-2px);box-shadow:3px 3px 0 var(--ink);}
+.type-card.sel{background:var(--ink);color:white;}
+.type-card .te{font-size:1.6rem;margin-bottom:.3rem;}
+.type-card .tt{font-weight:700;font-size:.88rem;}
+.type-card .td{font-size:.72rem;color:var(--muted);margin-top:.15rem;}
+.type-card.sel .td{color:rgba(255,255,255,.6);}
+.src-pills{display:flex;gap:.45rem;flex-wrap:wrap;margin-bottom:1rem;}
+/* EXAM SCREEN — hide live score */
+.exam-topbar{position:sticky;top:var(--nav);z-index:100;background:rgba(245,240,232,.96);backdrop-filter:blur(10px);border-bottom:2px solid var(--ink);padding:.65rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;transition:background .3s;}
+[data-theme="dark"] .exam-topbar{background:rgba(15,15,26,.96);}
+.tb-meta{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--muted);}
+.tb-meta strong{color:var(--text);font-size:.9rem;}
+.timer{background:var(--ink);color:var(--gold);font-family:'JetBrains Mono',monospace;font-size:.95rem;font-weight:700;padding:.3rem .9rem;border-radius:100px;min-width:68px;text-align:center;}
+.timer.urgent{background:var(--accent);color:white;animation:pulse .8s infinite;}
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.06);}}
+.exam-prog{height:4px;background:var(--paper-warm);}
+.exam-prog-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent3));transition:width .4s ease;}
+.exam-layout{display:grid;grid-template-columns:1fr 240px;gap:1.25rem;align-items:start;margin-top:1.25rem;}
+@media(max-width:700px){.exam-layout{grid-template-columns:1fr;}}
+.q-card{background:white;border:1.5px solid #e0dcd4;border-radius:14px;padding:1.5rem;margin-bottom:.85rem;transition:border-color .2s,background .3s;}
+.q-card:hover{border-color:var(--ink);}
+.q-card.ac{border-left:4px solid var(--accent2);background:#f0f7ff;}
+.q-card.sk{border-left:4px solid var(--gold);background:#fffbf0;}
+[data-theme="dark"] .q-card.ac{background:#0e1f33;}
+[data-theme="dark"] .q-card.sk{background:#1a1500;}
+.q-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.85rem;gap:.5rem;}
+.q-num{font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:600;background:var(--ink);color:var(--gold);padding:.18rem .6rem;border-radius:100px;white-space:nowrap;flex-shrink:0;}
+.q-type{font-family:'JetBrains Mono',monospace;font-size:.63rem;color:var(--muted);border:1px solid var(--paper-warm);padding:.12rem .45rem;border-radius:4px;}
+.q-word{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;color:var(--ink);margin-bottom:.6rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;}
+.q-spk{background:none;border:1.5px solid var(--paper-warm);border-radius:5px;padding:.1rem .38rem;cursor:pointer;font-size:.78rem;transition:all .15s;}
+.q-spk:hover{background:var(--paper-warm);}
+.q-stem{font-size:.9rem;font-weight:600;color:var(--ink);margin-bottom:.65rem;line-height:1.5;}
+.q-sent{background:var(--paper-warm);border-radius:7px;padding:.6rem .9rem;font-style:italic;font-size:.84rem;color:var(--text);line-height:1.5;margin-bottom:.85rem;border-left:3px solid var(--accent2);}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;}
+@media(max-width:480px){.opts{grid-template-columns:1fr;}}
+.opt{padding:.65rem .9rem;border:2px solid var(--paper-warm);background:var(--paper-warm);border-radius:8px;cursor:pointer;font-family:'Hind Siliguri',sans-serif;font-size:.88rem;font-weight:500;text-align:left;transition:all .15s;color:var(--text);display:flex;align-items:center;gap:.45rem;}
+.opt:hover:not(.sel):not(:disabled){border-color:var(--ink);background:white;}
+.opt.sel{border-color:var(--accent2);background:#e8f4fd;font-weight:700;}
+[data-theme="dark"] .opt.sel{background:#0e2233;}
+.opt-lt{width:20px;height:20px;border-radius:4px;background:white;border:1.5px solid #ccc;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;flex-shrink:0;transition:all .15s;}
+.opt.sel .opt-lt{background:var(--accent2);color:white;border-color:var(--accent2);}
+.skip-btn{background:none;border:none;color:var(--muted);font-size:.76rem;font-family:'Hind Siliguri',sans-serif;cursor:pointer;margin-top:.55rem;text-decoration:underline;}
+/* SIDEBAR */
+.exam-sb{background:white;border:2px solid var(--ink);border-radius:14px;padding:1.1rem;position:sticky;top:calc(var(--nav) + 60px);transition:background .3s,border-color .3s;}
+.sb-title{font-family:'JetBrains Mono',monospace;font-size:.67rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:.65rem;}
+.nav-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(32px,1fr));gap:.3rem;margin-bottom:.85rem;}
+.nav-btn{height:32px;border-radius:6px;border:2px solid var(--paper-warm);background:var(--paper-warm);font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:600;cursor:pointer;transition:all .15s;color:var(--text);}
+.nav-btn.answered{background:var(--accent2);border-color:var(--accent2);color:white;}
+.nav-btn.skipped{background:var(--gold);border-color:var(--gold);color:var(--ink);}
+.nav-btn:hover{border-color:var(--ink);}
+.sb-legend{font-size:.72rem;color:var(--muted);display:flex;flex-direction:column;gap:.25rem;margin-bottom:.85rem;}
+.btn-submit-exam{width:100%;padding:.8rem;background:var(--accent);color:white;border:none;border-radius:9px;font-size:.95rem;font-weight:700;font-family:'Hind Siliguri',sans-serif;cursor:pointer;transition:opacity .2s;}
+.btn-submit-exam:hover{opacity:.87;}
+/* RESULT */
+.result-hero{background:var(--ink);color:white;border-radius:18px;padding:2.25rem 1.75rem;margin-bottom:1.25rem;text-align:center;}
+.r-pct{font-family:'JetBrains Mono',monospace;font-size:clamp(3.5rem,10vw,5.5rem);font-weight:700;color:var(--gold);line-height:1;}
+.r-grade{font-size:1.3rem;font-weight:700;margin:.4rem 0;}
+.r-sub{color:rgba(255,255,255,.55);font-size:.88rem;}
+.r-stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.85rem;margin-bottom:1.25rem;}
+@media(max-width:540px){.r-stat-grid{grid-template-columns:repeat(2,1fr);}}
+.r-stat-card{background:white;border:2px solid var(--ink);border-radius:12px;padding:1.1rem;text-align:center;transition:background .3s,border-color .3s;}
+.rs-num{font-family:'JetBrains Mono',monospace;font-size:1.75rem;font-weight:700;display:block;margin-bottom:.15rem;}
+.rs-lbl{font-size:.72rem;color:var(--muted);}
+.analysis-card{background:white;border:2px solid var(--ink);border-radius:14px;padding:1.4rem;margin-bottom:1rem;transition:background .3s,border-color .3s;}
+.a-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;margin-bottom:.9rem;}
+.bar-row{display:flex;align-items:center;gap:.65rem;margin-bottom:.55rem;}
+.bar-lbl{font-size:.76rem;color:var(--muted);width:44px;text-align:right;font-family:'JetBrains Mono',monospace;}
+.bar-track{flex:1;background:var(--paper-warm);border-radius:100px;height:16px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:100px;transition:width .9s ease;}
+.bar-val{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);width:40px;}
+.rv-item{border:1.5px solid var(--paper-warm);border-radius:11px;padding:.9rem 1.1rem;margin-bottom:.5rem;}
+.rv-item.rv-c{border-left:4px solid var(--accent3);}
+.rv-item.rv-w{border-left:4px solid var(--accent);}
+.rv-item.rv-s{border-left:4px solid var(--gold);}
+.rv-word{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;margin-bottom:.2rem;}
+.rv-row{display:flex;gap:.85rem;flex-wrap:wrap;font-size:.82rem;margin-top:.3rem;}
+.btn-retake{background:var(--ink);color:white;border:none;padding:.8rem 1.75rem;border-radius:9px;font-size:.95rem;font-weight:700;cursor:pointer;margin:.35rem .35rem 0 0;font-family:'Hind Siliguri',sans-serif;transition:opacity .2s;}
+.btn-retake:hover{opacity:.85;}
+</style>
+</head><body>
+<nav>
+  <a href="index.html" class="nav-logo">শব্দ<span>ভান্ডার</span><small>Word Smart I & II</small></a>
+  <ul id="desktop-nav"></ul><button id="hamburger" onclick="toggleMNav()">☰</button>
+</nav>
+<div id="mobile-nav"></div>
+
+<!-- SETUP -->
+<div id="setup-screen">
+<div class="wrap">
+  <div class="setup-hero">
+    <h1>📝 রিয়েল এক্সাম মোড</h1>
+    <p>নেগেটিভ মার্কিং · টাইমার · সাবমিটের পরে সম্পূর্ণ রিপোর্ট</p>
+  </div>
+  <div class="setup-card">
+    <div class="sec-lbl">পরীক্ষার কাঠামো</div>
+    <div class="field-row">
+      <div class="field"><label>মোট প্রশ্ন</label><input class="cfg-input" type="number" id="c-total" value="30" min="5" max="100"><div class="hint-text">সর্বোচ্চ ১০০</div></div>
+      <div class="field"><label>সঠিকে নম্বর (+)</label><input class="cfg-input" type="number" id="c-correct" value="1" min="0.25" max="10" step="0.25"></div>
+      <div class="field"><label>ভুলে বাদ (−)</label><input class="cfg-input" type="number" id="c-neg" value="0.25" min="0" max="5" step="0.25"><div class="hint-text">০ = নেগেটিভ নেই</div></div>
+      <div class="field"><label>সময়সীমা (মিনিট)</label><input class="cfg-input" type="number" id="c-time" value="20" min="0" max="180"><div class="hint-text">০ = সময়সীমা নেই</div></div>
+    </div>
+    <div class="marking-box" id="mark-box">
+      <div class="mb-item"><div class="mb-dot" style="background:var(--accent3)"></div><span id="mb-c">সঠিক: +১</span></div>
+      <div class="mb-item"><div class="mb-dot" style="background:var(--accent)"></div><span id="mb-n">ভুল: −০.২৫</span></div>
+      <div class="mb-item"><div class="mb-dot" style="background:var(--gold)"></div>এড়ানো: ০</div>
+      <div class="mb-item"><div class="mb-dot" style="background:var(--accent2)"></div>মোট নম্বর: <strong id="mb-t">৩০</strong></div>
+    </div>
+  </div>
+  <div class="setup-card">
+    <div class="sec-lbl">প্রশ্নের ধরন</div>
+    <div class="type-grid">
+      <div class="type-card sel" onclick="selType('mixed',this)"><div class="te">🎲</div><div class="tt">মিশ্র</div><div class="td">MCQ + সিনোনিম + এন্টোনিম</div></div>
+      <div class="type-card" onclick="selType('mcq',this)"><div class="te">🎯</div><div class="tt">শুধু MCQ</div><div class="td">বাংলা অর্থ বেছে নাও</div></div>
+      <div class="type-card" onclick="selType('synonym',this)"><div class="te">🔗</div><div class="tt">শুধু সিনোনিম</div><div class="td">সমার্থক শব্দ</div></div>
+      <div class="type-card" onclick="selType('antonym',this)"><div class="te">↔️</div><div class="tt">শুধু এন্টোনিম</div><div class="td">বিপরীতার্থক শব্দ</div></div>
+    </div>
+    <div class="sec-lbl">শব্দ উৎস</div>
+    <div class="src-pills">
+      <button class="spill active" onclick="setSrc('all',this)">সব শব্দ</button>
+      <button class="spill" onclick="setSrc('unseen',this)">না-শেখা</button>
+      <button class="spill" onclick="setSrc('hard',this)">কঠিন শব্দ</button>
+    </div>
+  </div>
+  <button class="btn-main" onclick="startExam()">🚀 পরীক্ষা শুরু করো</button>
+</div>
+</div>
+
+<!-- EXAM -->
+<div id="exam-screen" style="display:none">
+  <div class="exam-topbar">
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;">
+      <div class="tb-meta">প্রশ্ন <strong id="tb-ans">০</strong>/<strong id="tb-tot">৩০</strong></div>
+      <div class="tb-meta">উত্তর: <strong id="tb-done">০</strong> · বাকি: <strong id="tb-left">৩০</strong></div>
+    </div>
+    <div class="timer" id="timer">--:--</div>
+  </div>
+  <div class="exam-prog"><div class="exam-prog-fill" id="ep-fill" style="width:0%"></div></div>
+  <div class="wrap" style="padding-top:1.25rem;">
+    <div class="exam-layout">
+      <div id="q-list"></div>
+      <div class="exam-sb">
+        <div class="sb-title">নেভিগেশন</div>
+        <div class="nav-grid" id="nav-grid"></div>
+        <div class="sb-legend">
+          <span>🟦 উত্তর দেওয়া</span>
+          <span>🟨 এড়িয়ে গেছি</span>
+          <span>⬜ এখনো যাইনি</span>
+        </div>
+        <button class="btn-submit-exam" onclick="confirmSubmit()">📤 পরীক্ষা জমা দাও</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div id="result-screen" style="display:none">
+<div class="wrap">
+  <div class="result-hero">
+    <div class="r-pct" id="r-pct">০%</div>
+    <div class="r-grade" id="r-grade">—</div>
+    <div class="r-sub" id="r-sub">—</div>
+  </div>
+  <div class="r-stat-grid">
+    <div class="r-stat-card"><span class="rs-num" id="rs-score" style="color:var(--accent2)">০</span><div class="rs-lbl">প্রাপ্ত নম্বর</div></div>
+    <div class="r-stat-card"><span class="rs-num" id="rs-c" style="color:var(--accent3)">০</span><div class="rs-lbl">সঠিক ✓</div></div>
+    <div class="r-stat-card"><span class="rs-num" id="rs-w" style="color:var(--accent)">০</span><div class="rs-lbl">ভুল ✗</div></div>
+    <div class="r-stat-card"><span class="rs-num" id="rs-s" style="color:var(--gold)">০</span><div class="rs-lbl">এড়ানো ⊘</div></div>
+  </div>
+  <div class="analysis-card"><div class="a-title">📊 নম্বর বিশ্লেষণ</div><div id="bar-chart"></div></div>
+  <div class="analysis-card"><div class="a-title">🔬 ধরন অনুযায়ী</div><div id="type-analysis"></div></div>
+  <div class="analysis-card">
+    <div class="a-title">💡 ভুল হওয়া শব্দ</div>
+    <div id="missed-words" style="display:flex;flex-wrap:wrap;gap:.45rem;"></div>
+  </div>
+  <div class="analysis-card"><div class="a-title">📋 সম্পূর্ণ পর্যালোচনা</div><div id="answer-review"></div></div>
+  <div style="margin-top:1.25rem;flex-wrap:wrap;display:flex;">
+    <button class="btn-retake" onclick="location.reload()">↩ আবার পরীক্ষা দাও</button>
+    <button class="btn-retake" onclick="location.href='flashcard.html'">🃏 ভুলগুলো ফ্ল্যাশকার্ডে</button>
+    <button class="btn-retake" onclick="location.href='progress.html'">📊 অগ্রগতি দেখো</button>
+  </div>
+</div>
+</div>
+
+<footer><strong>শব্দভান্ডার</strong> — ডেভেলপ করেছেন - কামরুল হাসান</footer>
+<script src="words_data.js"></script><script src="theme.js"></script><script src="nav.js"></script>
+<script>
+initNav('exam.html');initTheme();
+let words=WORDS_DATA,cfg={total:30,correct:1,neg:.25,time:20,type:'mixed',src:'all'};
+let questions=[],answers={},examTimer=null,timeLeft=0;
+
+['c-total','c-correct','c-neg','c-time'].forEach(id=>{document.getElementById(id).addEventListener('input',updatePreview);});
+function updatePreview(){
+  const c=+document.getElementById('c-correct').value||1;
+  const n=+document.getElementById('c-neg').value||0;
+  const t=+document.getElementById('c-total').value||30;
+  document.getElementById('mb-c').textContent='সঠিক: +'+c;
+  document.getElementById('mb-n').textContent='ভুল: −'+n;
+  document.getElementById('mb-t').textContent=(t*c).toFixed(2)*1;
+}
+let qType='mixed',src='all';
+function selType(t,el){qType=t;document.querySelectorAll('.type-card').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');}
+function setSrc(s,el){src=s;document.querySelectorAll('.spill').forEach(b=>b.classList.remove('active'));el.classList.add('active');}
+
+function buildQ(w,num,qt){
+  if(qt==='synonym'){
+    const ans=w.synonyms[Math.floor(Math.random()*w.synonyms.length)];
+    const pool=[];words.forEach(o=>{if(o.id===w.id)return;o.synonyms?.forEach(s=>{if(!w.synonyms.includes(s))pool.push(s);});});
+    const opts=[{t:ans,c:true},...pool.sort(()=>Math.random()-.5).slice(0,3).map(d=>({t:d,c:false}))].sort(()=>Math.random()-.5);
+    return{num,w,qt,stem:`"${w.word}" (${w.meaning}) — এর সিনোনিম কোনটি?`,opts,ans,sent:null};
+  }
+  if(qt==='antonym'){
+    const ans=w.antonyms[Math.floor(Math.random()*w.antonyms.length)];
+    const pool=[];words.forEach(o=>{if(o.id===w.id)return;o.antonyms?.forEach(a=>{if(!w.antonyms.includes(a))pool.push(a);});});
+    const opts=[{t:ans,c:true},...pool.sort(()=>Math.random()-.5).slice(0,3).map(d=>({t:d,c:false}))].sort(()=>Math.random()-.5);
+    return{num,w,qt,stem:`"${w.word}" (${w.meaning}) — এর এন্টোনিম কোনটি?`,opts,ans,sent:null};
+  }
+  const dis=words.filter(x=>x.id!==w.id).sort(()=>Math.random()-.5).slice(0,3);
+  const opts=[{t:w.meaning,c:true},...dis.map(d=>({t:d.meaning,c:false}))].sort(()=>Math.random()-.5);
+  return{num,w,qt,stem:`"${w.word}" শব্দের সঠিক বাংলা অর্থ কোনটি?`,opts,ans:w.meaning,sent:w.sentence};
+}
+
+function startExam(){
+  cfg.total=+document.getElementById('c-total').value||30;
+  cfg.correct=+document.getElementById('c-correct').value||1;
+  cfg.neg=+document.getElementById('c-neg').value||0;
+  cfg.time=+document.getElementById('c-time').value||0;
+  const learned=JSON.parse(localStorage.getItem('vm_learned')||'{}');
+  const hard=JSON.parse(localStorage.getItem('vm_hard')||'{}');
+  let pool=[...words];
+  if(src==='unseen')pool=words.filter(w=>!learned[w.id]);
+  if(src==='hard')pool=words.filter(w=>hard[w.id]);
+  if(pool.length<4)pool=[...words];
+  if(qType==='synonym')pool=pool.filter(w=>w.synonyms?.length>0);
+  if(qType==='antonym')pool=pool.filter(w=>w.antonyms?.length>0);
+  if(pool.length<4)pool=[...words];
+  const shuffled=pool.sort(()=>Math.random()-.5).slice(0,Math.min(cfg.total,pool.length));
+  questions=shuffled.map((w,i)=>{
+    let qt=qType;
+    if(qt==='mixed'){const o=['mcq'];if(w.synonyms?.length)o.push('synonym');if(w.antonyms?.length)o.push('antonym');qt=o[Math.floor(Math.random()*o.length)];}
+    if(qt==='synonym'&&!w.synonyms?.length)qt='mcq';
+    if(qt==='antonym'&&!w.antonyms?.length)qt='mcq';
+    return buildQ(w,i+1,qt);
+  });
+  answers={};
+  document.getElementById('setup-screen').style.display='none';
+  document.getElementById('exam-screen').style.display='block';
+  document.getElementById('tb-tot').textContent=questions.length;
+  document.getElementById('tb-left').textContent=questions.length;
+  renderQs();buildNav();
+  if(cfg.time>0){timeLeft=cfg.time*60;startTimer();}
+  else document.getElementById('timer').textContent='∞';
+}
+
+function renderQs(){
+  const letters=['ক','খ','গ','ঘ'];
+  const tnames={mcq:'MCQ',synonym:'সিনোনিম',antonym:'এন্টোনিম'};
+  document.getElementById('q-list').innerHTML=questions.map(q=>`
+  <div class="q-card" id="qc-${q.num}">
+    <div class="q-hdr"><div class="q-num">প্রশ্ন ${q.num}</div><div class="q-type">${tnames[q.qt]||q.qt}</div></div>
+    <div class="q-word">${q.w.word}<button class="q-spk" onclick="speak('${q.w.word}')">🔊</button></div>
+    <div class="q-stem">${q.stem}</div>
+    ${q.sent?`<div class="q-sent">"${q.sent}"</div>`:''}
+    <div class="opts" id="opts-${q.num}">${q.opts.map((o,i)=>`
+      <button class="opt" id="opt-${q.num}-${i}" onclick="selectAns(${q.num},${i},${o.c},'${esc(o.t)}')">
+        <span class="opt-lt">${letters[i]}</span><span>${o.t}</span>
+      </button>`).join('')}
+    </div>
+    <button class="skip-btn" id="skip-${q.num}" onclick="skipQ(${q.num})">⊘ এই প্রশ্নটি এড়িয়ে যাও</button>
+  </div>`).join('');
+}
+
+function selectAns(num,i,ok,txt){
+  answers[num]={i,ok,txt,status:ok?'correct':'wrong'};
+  document.querySelectorAll(`#opts-${num} .opt`).forEach(b=>b.classList.remove('sel'));
+  document.getElementById(`opt-${num}-${i}`).classList.add('sel');
+  const card=document.getElementById(`qc-${num}`);
+  card.className='q-card ac';
+  document.getElementById(`skip-${num}`).style.display='none';
+  document.getElementById(`nav-${num}`).className='nav-btn answered';
+  updateTopbar();
+}
+function skipQ(num){
+  answers[num]={status:'skip'};
+  document.getElementById(`qc-${num}`).className='q-card sk';
+  document.getElementById(`skip-${num}`).style.display='none';
+  document.getElementById(`nav-${num}`).className='nav-btn skipped';
+  updateTopbar();
+}
+function buildNav(){
+  document.getElementById('nav-grid').innerHTML=questions.map(q=>`<button class="nav-btn" id="nav-${q.num}" onclick="document.getElementById('qc-${q.num}').scrollIntoView({behavior:'smooth',block:'center'})">${q.num}</button>`).join('');
+}
+function calcScore(){
+  let correct=0,wrong=0,skip=0,score=0;
+  questions.forEach(q=>{const a=answers[q.num];if(!a||a.status==='skip')skip++;else if(a.ok){correct++;score+=cfg.correct;}else{wrong++;score-=cfg.neg;}});
+  return{correct,wrong,skip,score:Math.max(0,score)};
+}
+function updateTopbar(){
+  const{correct,wrong,skip}=calcScore();
+  const done=correct+wrong+skip;const left=questions.length-done;
+  document.getElementById('tb-ans').textContent=done;
+  document.getElementById('tb-done').textContent=correct+wrong;
+  document.getElementById('tb-left').textContent=left;
+  document.getElementById('ep-fill').style.width=((correct+wrong)/questions.length*100)+'%';
+}
+function startTimer(){
+  function tick(){
+    const m=Math.floor(timeLeft/60),s=timeLeft%60;
+    const el=document.getElementById('timer');
+    el.textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+    if(timeLeft<=60)el.classList.add('urgent');
+    if(timeLeft<=0){clearInterval(examTimer);submitExam();return;}
+    timeLeft--;
+  }
+  tick();examTimer=setInterval(tick,1000);
+}
+function confirmSubmit(){
+  const{correct,wrong,skip}=calcScore();
+  const unanswered=questions.length-correct-wrong-skip;
+  if(unanswered>0&&!confirm(`এখনো ${unanswered}টি প্রশ্নের উত্তর দেওয়া হয়নি। জমা দেবে?`))return;
+  submitExam();
+}
+function submitExam(){
+  clearInterval(examTimer);
+  document.getElementById('exam-screen').style.display='none';
+  showResults();
+}
+function showResults(){
+  document.getElementById('result-screen').style.display='block';
+  const{correct,wrong,skip,score}=calcScore();
+  const maxScore=questions.length*cfg.correct;
+  const pct=maxScore>0?Math.round(score/maxScore*100):0;
+  document.getElementById('r-pct').textContent=pct+'%';
+  document.getElementById('rs-score').textContent=score.toFixed(2)*1+'/'+maxScore.toFixed(2)*1;
+  document.getElementById('rs-c').textContent=correct;
+  document.getElementById('rs-w').textContent=wrong;
+  document.getElementById('rs-s').textContent=skip;
+  let grade,sub;
+  if(pct>=90){grade='A+ অসাধারণ! 🏆';sub='তুমি সত্যিই দক্ষ!';}
+  else if(pct>=80){grade='A ভালো! 🎉';sub='চমৎকার পারফরম্যান্স।';}
+  else if(pct>=70){grade='B+ মোটামুটি ভালো 👍';sub='আরও একটু চেষ্টা করো।';}
+  else if(pct>=60){grade='B পাস ✓';sub='নিয়মিত পড়তে থাকো।';}
+  else if(pct>=40){grade='C দুর্বল 🙂';sub='ফ্ল্যাশকার্ডে আরও পড়ো।';}
+  else{grade='D আরও পড়তে হবে 📚';sub='হতাশ হয়ো না, আবার চেষ্টা করো!';}
+  document.getElementById('r-grade').textContent=grade;
+  document.getElementById('r-sub').textContent=sub;
+  const gained=correct*cfg.correct,lost=wrong*cfg.neg;
+  document.getElementById('bar-chart').innerHTML=`
+    <div class="bar-row"><div class="bar-lbl">মোট</div><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--paper-warm)"></div></div><div class="bar-val">${maxScore.toFixed(0)}</div></div>
+    <div class="bar-row"><div class="bar-lbl">প্রাপ্ত</div><div class="bar-track"><div class="bar-fill" style="width:${(score/maxScore*100).toFixed(1)}%;background:var(--accent2)"></div></div><div class="bar-val">${score.toFixed(2)*1}</div></div>
+    <div class="bar-row"><div class="bar-lbl">সঠিক</div><div class="bar-track"><div class="bar-fill" style="width:${(gained/maxScore*100).toFixed(1)}%;background:var(--accent3)"></div></div><div class="bar-val">+${gained.toFixed(2)*1}</div></div>
+    <div class="bar-row"><div class="bar-lbl">বাদ</div><div class="bar-track"><div class="bar-fill" style="width:${Math.min(100,(lost/maxScore*100)).toFixed(1)}%;background:var(--accent)"></div></div><div class="bar-val">−${lost.toFixed(2)*1}</div></div>`;
+  const byType={};
+  questions.forEach(q=>{if(!byType[q.qt])byType[q.qt]={c:0,w:0,s:0};const a=answers[q.num];if(!a||a.status==='skip')byType[q.qt].s++;else if(a.ok)byType[q.qt].c++;else byType[q.qt].w++;});
+  const tnames={mcq:'MCQ (অর্থ)',synonym:'সিনোনিম',antonym:'এন্টোনিম'};
+  document.getElementById('type-analysis').innerHTML=Object.entries(byType).map(([t,d])=>{
+    const tot=d.c+d.w+d.s;const tp=Math.round(d.c/tot*100);
+    return`<div style="margin-bottom:.85rem;"><div style="display:flex;justify-content:space-between;font-size:.83rem;margin-bottom:.3rem;"><span><strong>${tnames[t]||t}</strong></span><span style="font-family:'JetBrains Mono',monospace;color:var(--accent2)">${tp}% (${d.c}/${tot})</span></div><div class="bar-track" style="height:11px;"><div class="bar-fill" style="width:${tp}%;background:${tp>=70?'var(--accent3)':tp>=40?'var(--gold)':'var(--accent)'}"></div></div></div>`;
+  }).join('');
+  const missed=questions.filter(q=>{const a=answers[q.num];return a&&!a.ok&&a.status!=='skip';});
+  document.getElementById('missed-words').innerHTML=missed.length===0?'<span style="color:var(--accent3);font-weight:600">🎉 সব সঠিক!</span>':missed.map(q=>`<span style="background:#fde8e4;border:1.5px solid #f5b8b0;border-radius:7px;padding:.28rem .65rem;font-size:.82rem;font-weight:600;color:var(--accent);cursor:pointer;" onclick="location.href='dictionary.html'" title="${q.w.meaning}">${q.w.word}</span>`).join('');
+  document.getElementById('answer-review').innerHTML=questions.map(q=>{
+    const a=answers[q.num];
+    let st,stxt,your;
+    if(!a||a.status==='skip'){st='rv-s';stxt='⊘ এড়ানো';your='—';}
+    else if(a.ok){st='rv-c';stxt='✓ সঠিক';your=a.txt;}
+    else{st='rv-w';stxt='✗ ভুল';your=a.txt||'—';}
+    return`<div class="rv-item ${st}"><div class="rv-word">${q.num}. ${q.w.word}</div><div style="font-size:.8rem;color:var(--muted);margin-bottom:.2rem">${q.w.meaning}</div><div class="rv-row"><span style="color:var(--accent)">তুমি: ${your}</span><span style="color:var(--accent3)">সঠিক: ${q.ans}</span><strong style="color:${st==='rv-c'?'var(--accent3)':st==='rv-w'?'var(--accent)':'var(--gold)'}">${stxt}</strong></div></div>`;
+  }).join('');
+  const hard=JSON.parse(localStorage.getItem('vm_hard')||'{}');
+  missed.forEach(q=>{hard[q.w.id]=true;});
+  localStorage.setItem('vm_hard',JSON.stringify(hard));
+  const history=JSON.parse(localStorage.getItem('vm_exam_history')||'[]');
+  history.unshift({date:new Date().toLocaleString('bn-BD'),total:questions.length,correct,wrong,skip,score:score.toFixed(2)*1,maxScore:maxScore.toFixed(2)*1,pct});
+  localStorage.setItem('vm_exam_history',JSON.stringify(history.slice(0,30)));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function esc(s){return(s||'').replace(/'/g,"\\'").replace(/"/g,'\\"');}
+updatePreview();
+</script>
+</body></html>
